@@ -10,6 +10,7 @@ const envSchema = z.object({
   HOST: z.string().default('0.0.0.0'),
   ORIGEM_FRONTEND: z.string().default('http://localhost:5173'),
   DATABASE_URL: z.string().min(1),
+  JWT_SECRET: z.string().min(16),
 })
 
 const envValidada = envSchema.safeParse(process.env)
