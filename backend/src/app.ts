@@ -4,6 +4,7 @@ import fastify from 'fastify'
 import { ZodError } from 'zod'
 
 import { configuracoesPomodoroRoutes } from './modules/configuracoes-pomodoro/infra/configuracoes-pomodoro.routes.js'
+import { resumosDiariosRoutes } from './modules/resumos-diarios/infra/resumos-diarios.routes.js'
 import { saudeRoutes } from './modules/saude/infra/saude.routes.js'
 import { usuariosRoutes } from './modules/usuarios/infra/usuarios.routes.js'
 import { env } from './shared/config/env.js'
@@ -29,6 +30,7 @@ export function construirApp() {
   app.register(saudeRoutes)
   app.register(usuariosRoutes)
   app.register(configuracoesPomodoroRoutes)
+  app.register(resumosDiariosRoutes)
 
   app.addHook('onClose', async () => {
     await prisma.$disconnect()
