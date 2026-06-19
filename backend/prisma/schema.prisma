@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TipoSessaoPomodoro {
+  POMODORO
+  DESCANSO_CURTO
+  DESCANSO_LONGO
+}
+
+enum StatusSessaoPomodoro {
+  CRIADA
+  EM_ANDAMENTO
+  PAUSADA
+  CONCLUIDA
+  CANCELADA
+}
+
+model Usuario {
+  id             String                @id @default(uuid())
+  nome           String?
+  email          String                @unique
+  senhaHash      String
+  criadoEm       DateTime              @default(now())
+  atualizadoEm   DateTime              @updatedAt
+  configuracao   ConfiguracaoPomodoro?
+  sessoes        SessaoPomodoro[]
+  resumosDiarios ResumoDiario[]
+
+  @@map("usuarios")
+}
+
+model ConfiguracaoPomodoro {
+  id                             String   @id @default(uuid())
+  usuarioId                      String   @unique
+  tempoPomodoroMinutos           Int      @default(25)
+  tempoDescansoCurtoMinutos      Int      @default(5)
+  tempoDescansoLongoMinutos      Int      @default(15)
+  pomodorosParaDescansoLongo     Int      @default(4)
+  iniciarDescansoAutomaticamente Boolean  @default(false)
+  iniciarPomodoroAutomaticamente Boolean  @default(false)
+  criadoEm                       DateTime @default(now())
+  atualizadoEm                   DateTime @updatedAt
+  usuario                        Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@map("configuracoes_pomodoro")
+}
+
+model SessaoPomodoro {
+  id             String               @id @default(uuid())
+  usuarioId      String
+  tipo           TipoSessaoPomodoro
+  status         StatusSessaoPomodoro @default(CRIADA)
+  duracaoMinutos Int
+  iniciadoEm     DateTime?
+  finalizadoEm   DateTime?
+  criadoEm       DateTime             @default(now())
+  atualizadoEm   DateTime             @updatedAt
+  usuario        Usuario              @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId, criadoEm])
+  @@map("sessoes_pomodoro")
+}
+
+model ResumoDiario {
+  id                        String   @id @default(uuid())
+  usuarioId                 String
+  data                      DateTime @db.Date
+  pomodorosRealizados       Int      @default(0)
+  descansosCurtosRealizados Int      @default(0)
+  descansosLongosRealizados Int      @default(0)
+  tempoEstudandoMinutos     Int      @default(0)
+  tempoDescansoMinutos      Int      @default(0)
+  criadoEm                  DateTime @default(now())
+  atualizadoEm              DateTime @updatedAt
+  usuario                   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([usuarioId, data])
+  @@index([usuarioId, data])
+  @@map("resumos_diarios")
+}
