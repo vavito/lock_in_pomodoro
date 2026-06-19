@@ -1,10 +1,10 @@
 services:
   postgres:
-    image: postgres:18-alpine
+    image: postgres:17-alpine
     container_name: lock_in_pomodoro_postgres
     restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "5433:5432"
     environment:
       POSTGRES_USER: lock_in
       POSTGRES_PASSWORD: lock_in
