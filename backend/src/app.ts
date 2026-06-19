@@ -6,6 +6,7 @@ import { ZodError } from 'zod'
 import { configuracoesPomodoroRoutes } from './modules/configuracoes-pomodoro/infra/configuracoes-pomodoro.routes.js'
 import { resumosDiariosRoutes } from './modules/resumos-diarios/infra/resumos-diarios.routes.js'
 import { saudeRoutes } from './modules/saude/infra/saude.routes.js'
+import { sessoesPomodoroRoutes } from './modules/sessoes-pomodoro/infra/sessoes-pomodoro.routes.js'
 import { usuariosRoutes } from './modules/usuarios/infra/usuarios.routes.js'
 import { env } from './shared/config/env.js'
 import { ErroAplicacao } from './shared/errors/erro-aplicacao.js'
@@ -31,6 +32,7 @@ export function construirApp() {
   app.register(usuariosRoutes)
   app.register(configuracoesPomodoroRoutes)
   app.register(resumosDiariosRoutes)
+  app.register(sessoesPomodoroRoutes)
 
   app.addHook('onClose', async () => {
     await prisma.$disconnect()
