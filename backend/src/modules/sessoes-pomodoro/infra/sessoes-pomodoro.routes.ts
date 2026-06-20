@@ -10,6 +10,7 @@ import { PrismaSessaoPomodoroRepository } from '../repository/prisma-sessao-pomo
 import { CancelarSessaoPomodoroService } from '../service/cancelar-sessao-pomodoro.service.js'
 import { ConcluirSessaoPomodoroService } from '../service/concluir-sessao-pomodoro.service.js'
 import { CriarSessaoPomodoroService } from '../service/criar-sessao-pomodoro.service.js'
+import { PararSessaoPomodoroService } from '../service/parar-sessao-pomodoro.service.js'
 
 export async function sessoesPomodoroRoutes(app: FastifyInstance) {
   const sessaoPomodoroRepository = new PrismaSessaoPomodoroRepository(prisma)
@@ -30,10 +31,16 @@ export async function sessoesPomodoroRoutes(app: FastifyInstance) {
   const cancelarSessaoPomodoroService = new CancelarSessaoPomodoroService(
     sessaoPomodoroRepository,
   )
+  const pararSessaoPomodoroService = new PararSessaoPomodoroService(
+    sessaoPomodoroRepository,
+    resumoDiarioRepository,
+    buscarConfiguracaoPomodoroService,
+  )
   const sessaoPomodoroController = new SessaoPomodoroController(
     criarSessaoPomodoroService,
     concluirSessaoPomodoroService,
     cancelarSessaoPomodoroService,
+    pararSessaoPomodoroService,
   )
 
   app.post(
@@ -58,5 +65,13 @@ export async function sessoesPomodoroRoutes(app: FastifyInstance) {
       preHandler: autenticar,
     },
     sessaoPomodoroController.cancelar.bind(sessaoPomodoroController),
+  )
+
+  app.patch(
+    '/sessoes-pomodoro/:id/parar',
+    {
+      preHandler: autenticar,
+    },
+    sessaoPomodoroController.parar.bind(sessaoPomodoroController),
   )
 }

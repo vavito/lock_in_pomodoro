@@ -62,6 +62,7 @@ export function Timer() {
   const [tipo, setTipo] = useState<TipoSessao>("POMODORO");
   const [sessaoId, setSessaoId] = useState<string | null>(null);
   const [rodando, setRodando] = useState(false);
+  const [timerCongelado, setTimerCongelado] = useState(false);
   const [segundosRestantes, setSegundosRestantes] = useState(25 * 60);
   const [erro, setErro] = useState<string | null>(null);
   const intervaloRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -90,9 +91,9 @@ export function Timer() {
   }, []);
 
   useEffect(() => {
-    if (rodando) return;
+    if (rodando || timerCongelado) return;
     setSegundosRestantes(duracaoDeMinutos(tipo, config) * 60);
-  }, [tipo, config, rodando]);
+  }, [tipo, config, rodando, timerCongelado]);
 
   useEffect(() => {
     if ("Notification" in window && Notification.permission === "default") {
@@ -125,6 +126,7 @@ export function Timer() {
         const sessao = await sessoesApi.criar(t);
         setTipo(t);
         setSessaoId(sessao.id);
+        setTimerCongelado(false);
         setSegundosRestantes(duracaoDeMinutos(t, config) * 60);
         setRodando(true);
       } catch (e) {
@@ -151,6 +153,7 @@ export function Timer() {
             setTipo(proximo);
             setSessaoId(null);
             setRodando(false);
+            setTimerCongelado(false);
             setSegundosRestantes(duracaoDeMinutos(proximo, config) * 60);
             if (config.iniciarDescansoAutomaticamente) {
               setTimeout(() => iniciarComTipo(proximo), 600);
@@ -160,6 +163,7 @@ export function Timer() {
             setTipo(proximo);
             setSessaoId(null);
             setRodando(false);
+            setTimerCongelado(false);
             setSegundosRestantes(duracaoDeMinutos(proximo, config) * 60);
             if (config.iniciarPomodoroAutomaticamente) {
               setTimeout(() => iniciarComTipo(proximo), 600);
@@ -198,14 +202,25 @@ export function Timer() {
     limparIntervalo();
     setRodando(false);
     const id = sessaoId;
+    const minutosRealizados = Math.ceil((totalSegundos - segundosRestantes) / 60);
     setSessaoId(null);
-    setSegundosRestantes(duracaoDeMinutos(tipo, config) * 60);
+    setTimerCongelado(true);
     if (id) {
       try {
-        await sessoesApi.cancelar(id);
+        await sessoesApi.parar(id, hojeYYYYMMDD(), Math.max(0, minutosRealizados));
+        await recarregarResumo();
       } catch (e) {
         setErro((e as Error).message);
       }
+    }
+  };
+
+  const pular = async () => {
+    limparIntervalo();
+    setRodando(false);
+    const id = sessaoId;
+    if (id) {
+      await concluirSessao(id);
     }
   };
 
@@ -221,7 +236,11 @@ export function Timer() {
         {ABAS.map((a) => (
           <button
             key={a.tipo}
-            onClick={() => !rodando && setTipo(a.tipo)}
+            onClick={() => {
+              if (rodando) return;
+              setTimerCongelado(false);
+              setTipo(a.tipo);
+            }}
             disabled={rodando && tipo !== a.tipo}
             className={
               "cursor-pointer rounded-xl px-5 py-2 text-sm font-medium transition-colors " +
@@ -280,12 +299,20 @@ export function Timer() {
             INICIAR
           </button>
         ) : (
-          <button
-            onClick={parar}
-            className="cursor-pointer rounded-2xl border border-border bg-card px-12 py-5 text-lg font-bold tracking-widest text-foreground transition-all hover:bg-secondary active:scale-95"
-          >
-            PARAR
-          </button>
+          <div className="flex flex-wrap justify-center gap-3">
+            <button
+              onClick={parar}
+              className="cursor-pointer rounded-2xl border border-border bg-card px-10 py-5 text-lg font-bold tracking-widest text-foreground transition-all hover:bg-secondary active:scale-95"
+            >
+              PARAR
+            </button>
+            <button
+              onClick={pular}
+              className="cursor-pointer rounded-2xl bg-primary px-10 py-5 text-lg font-bold tracking-widest text-primary-foreground transition-all hover:opacity-90 active:scale-95"
+            >
+              PULAR &gt;&gt;
+            </button>
+          </div>
         )}
       </div>
 

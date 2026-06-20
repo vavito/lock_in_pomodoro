@@ -10,6 +10,7 @@ import type { SessaoPomodoroRepository } from '../repository/sessao-pomodoro.rep
 import { CancelarSessaoPomodoroService } from './cancelar-sessao-pomodoro.service.js'
 import { ConcluirSessaoPomodoroService } from './concluir-sessao-pomodoro.service.js'
 import { CriarSessaoPomodoroService } from './criar-sessao-pomodoro.service.js'
+import { PararSessaoPomodoroService } from './parar-sessao-pomodoro.service.js'
 
 class SessaoPomodoroRepositoryEmMemoria implements SessaoPomodoroRepository {
   sessoes: SessaoPomodoro[] = []
@@ -107,6 +108,11 @@ function criarServicos() {
     cancelarSessaoPomodoroService: new CancelarSessaoPomodoroService(
       sessaoPomodoroRepository,
     ),
+    pararSessaoPomodoroService: new PararSessaoPomodoroService(
+      sessaoPomodoroRepository,
+      resumoDiarioRepository,
+      buscarConfiguracaoPomodoroService,
+    ),
   }
 }
 
@@ -170,6 +176,33 @@ describe('sessao pomodoro', () => {
 
     expect(sessaoCancelada.status).toBe('CANCELADA')
     expect(resumo).toBeNull()
+  })
+
+  it('deve parar sessao e salvar tempo parcial sem incrementar contador', async () => {
+    const {
+      criarSessaoPomodoroService,
+      pararSessaoPomodoroService,
+      resumoDiarioRepository,
+    } = criarServicos()
+    const data = new Date('2026-06-19T00:00:00.000Z')
+    const sessao = await criarSessaoPomodoroService.executar('usuario-1', {
+      tipo: 'POMODORO',
+    })
+
+    const sessaoParada = await pararSessaoPomodoroService.executar(
+      'usuario-1',
+      sessao.id,
+      data,
+      12,
+    )
+    const resumo = await resumoDiarioRepository.buscarPorUsuarioIdEData(
+      'usuario-1',
+      data,
+    )
+
+    expect(sessaoParada.status).toBe('CANCELADA')
+    expect(resumo?.pomodorosRealizados).toBe(0)
+    expect(resumo?.tempoEstudandoMinutos).toBe(12)
   })
 
   it('nao deve concluir sessao cancelada', async () => {

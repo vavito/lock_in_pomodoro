@@ -1,5 +1,6 @@
 import { ErroAplicacao } from '../../../shared/errors/erro-aplicacao.js'
 import type { ConfiguracaoPomodoro } from '../../configuracoes-pomodoro/domain/ConfiguracaoPomodoro.js'
+import type { TipoSessaoPomodoro } from '../../sessoes-pomodoro/domain/SessaoPomodoro.js'
 
 type ResumoDiarioProps = {
   id?: string
@@ -110,6 +111,24 @@ export class ResumoDiario {
         configuracao.tempoDescansoCurtoMinutos +
       this.props.descansosLongosRealizados *
         configuracao.tempoDescansoLongoMinutos
+  }
+
+  registrarTempoParcial(tipo: TipoSessaoPomodoro, minutosRealizados: number) {
+    if (
+      !Number.isInteger(minutosRealizados) ||
+      minutosRealizados < 0 ||
+      minutosRealizados > 59
+    ) {
+      throw new ErroAplicacao('Tempo parcial deve estar entre 0 e 59 minutos')
+    }
+
+    if (tipo === 'POMODORO') {
+      this.props.tempoEstudandoMinutos += minutosRealizados
+    } else {
+      this.props.tempoDescansoMinutos += minutosRealizados
+    }
+
+    this.props.atualizadoEm = new Date()
   }
 
   private validar() {
