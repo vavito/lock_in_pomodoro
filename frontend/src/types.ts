@@ -53,7 +53,16 @@ export type Estatisticas = {
   tempoEstudandoMinutos: number;
   tempoDescansoMinutos: number;
   diasUsados: number;
-  dias: ResumoDiario[];
+  dias: EstatisticaDia[];
+};
+
+export type EstatisticaDia = {
+  data: string;
+  pomodorosRealizados: number;
+  descansosCurtosRealizados: number;
+  descansosLongosRealizados: number;
+  tempoEstudandoMinutos: number;
+  tempoDescansoMinutos: number;
 };
 
 export type AuthResponse = {
