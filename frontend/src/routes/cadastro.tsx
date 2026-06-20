@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { Eye, EyeOff } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { emailValido, senhaValida, validarCamposAuth, type ErrosAuth } from "@/lib/validacoes-auth";
@@ -9,7 +10,7 @@ type ErrosCadastro = ErrosAuth & {
 
 export const Route = createFileRoute("/cadastro")({
   ssr: false,
-  head: () => ({ meta: [{ title: "Cadastro — Lock In Pomodoro" }] }),
+  head: () => ({ meta: [{ title: "Cadastro - Lock In Pomodoro" }] }),
   component: CadastroPage,
 });
 
@@ -22,6 +23,7 @@ function CadastroPage() {
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [errosCampos, setErrosCampos] = useState<ErrosCadastro>({});
+  const [senhaVisivel, setSenhaVisivel] = useState(false);
 
   useEffect(() => {
     if (logado) router.navigate({ to: "/" });
@@ -125,6 +127,7 @@ function CadastroPage() {
               </span>
             )}
           </label>
+
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-medium text-muted-foreground">E-mail</span>
             <input
@@ -147,23 +150,35 @@ function CadastroPage() {
               </span>
             )}
           </label>
+
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-medium text-muted-foreground">Senha</span>
-            <input
-              type="password"
-              value={senha}
-              onChange={(e) => alterarSenha(e.target.value)}
-              required
-              minLength={8}
-              aria-invalid={!!errosCampos.senha}
-              aria-describedby={errosCampos.senha ? "cadastro-senha-erro" : undefined}
-              className={
-                "rounded-lg border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 " +
-                (errosCampos.senha
-                  ? "border-destructive focus:ring-destructive"
-                  : "border-border focus:ring-primary")
-              }
-            />
+            <div className="relative">
+              <input
+                type={senhaVisivel ? "text" : "password"}
+                value={senha}
+                onChange={(e) => alterarSenha(e.target.value)}
+                required
+                minLength={8}
+                aria-invalid={!!errosCampos.senha}
+                aria-describedby={errosCampos.senha ? "cadastro-senha-erro" : undefined}
+                className={
+                  "w-full rounded-lg border bg-background px-3 py-2.5 pr-11 text-sm text-foreground outline-none focus:ring-2 " +
+                  (errosCampos.senha
+                    ? "border-destructive focus:ring-destructive"
+                    : "border-border focus:ring-primary")
+                }
+              />
+              <button
+                type="button"
+                onClick={() => setSenhaVisivel((visivel) => !visivel)}
+                aria-label={senhaVisivel ? "Ocultar senha" : "Mostrar senha"}
+                title={senhaVisivel ? "Ocultar senha" : "Mostrar senha"}
+                className="absolute right-3 top-1/2 flex size-5 -translate-y-1/2 cursor-pointer items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
+              >
+                {senhaVisivel ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              </button>
+            </div>
             {errosCampos.senha && (
               <span id="cadastro-senha-erro" className="text-xs text-destructive">
                 {errosCampos.senha}
@@ -183,7 +198,7 @@ function CadastroPage() {
         </button>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          Já tem conta?{" "}
+          Ja tem conta?{" "}
           <Link to="/login" className="text-primary hover:underline">
             Entrar
           </Link>
