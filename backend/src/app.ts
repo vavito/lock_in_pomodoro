@@ -20,6 +20,8 @@ export function construirApp() {
 
   app.register(cors, {
     origin: env.ORIGEM_FRONTEND === '*' ? true : env.ORIGEM_FRONTEND,
+    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   })
 
   app.register(jwt, {
