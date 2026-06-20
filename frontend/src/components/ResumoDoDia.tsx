@@ -24,7 +24,7 @@ export function ResumoDoDia({ resumo, aoAtualizar }: Props) {
   }, [resumo]);
 
   const validarContador = (valor: string, rotulo: string) => {
-    if (valor.trim() === "") return `${rotulo} deve estar entre 0 e 1000.`;
+    if (valor.trim() === "") return 0;
 
     const numero = Number(valor);
     if (!Number.isInteger(numero) || numero < 0 || numero > 1000) {
