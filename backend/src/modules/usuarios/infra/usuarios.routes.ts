@@ -4,14 +4,23 @@ import { autenticar } from '../../../shared/infra/http/autenticar.js'
 import { prisma } from '../../../shared/infra/prisma/prisma.js'
 import { AuthController } from '../controller/auth.controller.js'
 import { UsuarioController } from '../controller/usuario.controller.js'
+import { PrismaTokenAtualizacaoRepository } from '../repository/prisma-token-atualizacao.repository.js'
 import { PrismaUsuarioRepository } from '../repository/prisma-usuario.repository.js'
 import { BuscarUsuarioLogadoService } from '../service/buscar-usuario-logado.service.js'
 import { CadastrarUsuarioService } from '../service/cadastrar-usuario.service.js'
 import { LoginUsuarioService } from '../service/login-usuario.service.js'
+import {
+  GerarTokenAtualizacaoService,
+  LogoutService,
+  RenovarTokenService,
+} from '../service/token-atualizacao.service.js'
 import { Argon2SenhaService } from './argon2-senha.service.js'
 
 export async function usuariosRoutes(app: FastifyInstance) {
   const usuarioRepository = new PrismaUsuarioRepository(prisma)
+  const tokenAtualizacaoRepository = new PrismaTokenAtualizacaoRepository(
+    prisma,
+  )
   const senhaService = new Argon2SenhaService()
   const cadastrarUsuarioService = new CadastrarUsuarioService(
     usuarioRepository,
@@ -24,14 +33,28 @@ export async function usuariosRoutes(app: FastifyInstance) {
   const buscarUsuarioLogadoService = new BuscarUsuarioLogadoService(
     usuarioRepository,
   )
+  const gerarTokenAtualizacaoService = new GerarTokenAtualizacaoService(
+    tokenAtualizacaoRepository,
+  )
+  const renovarTokenService = new RenovarTokenService(
+    tokenAtualizacaoRepository,
+    usuarioRepository,
+    gerarTokenAtualizacaoService,
+  )
+  const logoutService = new LogoutService(tokenAtualizacaoRepository)
   const authController = new AuthController(
     cadastrarUsuarioService,
     loginUsuarioService,
+    gerarTokenAtualizacaoService,
+    renovarTokenService,
+    logoutService,
   )
   const usuarioController = new UsuarioController(buscarUsuarioLogadoService)
 
   app.post('/auth/cadastro', authController.cadastrar.bind(authController))
   app.post('/auth/login', authController.login.bind(authController))
+  app.post('/auth/refresh', authController.renovar.bind(authController))
+  app.post('/auth/logout', authController.logout.bind(authController))
   app.get(
     '/usuarios/me',
     {

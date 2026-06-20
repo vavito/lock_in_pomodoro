@@ -25,7 +25,7 @@ export function construirApp() {
   app.register(jwt, {
     secret: env.JWT_SECRET,
     sign: {
-      expiresIn: '7d',
+      expiresIn: '15m',
     },
   })
 
