@@ -1,4 +1,5 @@
 import { Link, useRouter } from "@tanstack/react-router";
+import { LogOut, Moon, Sun } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
@@ -23,10 +24,11 @@ function ToggleTema() {
   return (
     <button
       onClick={alternar}
-      className="rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-      title="Alternar tema"
+      className="flex size-9 cursor-pointer items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-colors hover:text-foreground"
+      title={escuro ? "Ativar modo claro" : "Ativar modo escuro"}
+      aria-label={escuro ? "Ativar modo claro" : "Ativar modo escuro"}
     >
-      {escuro ? "Claro" : "Escuro"}
+      {escuro ? <Sun className="size-4" /> : <Moon className="size-4" />}
     </button>
   );
 }
@@ -71,8 +73,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             </span>
             <button
               onClick={sair}
-              className="rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className="flex h-9 cursor-pointer items-center gap-2 rounded-lg border border-border bg-card px-3 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
+              <LogOut className="size-4" />
               Sair
             </button>
           </div>

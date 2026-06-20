@@ -6,4 +6,5 @@ dist
 *.log
 coverage
 .DS_Store
+.vscode/
 Melhorias Lock In Pomodoro - v1.pdf
