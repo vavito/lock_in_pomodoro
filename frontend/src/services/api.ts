@@ -243,6 +243,13 @@ export const sessoesApi = {
     });
     return resposta.sessao;
   },
+  parar: async (id: string, data: string, minutosRealizados: number) => {
+    const resposta = await request<SessaoResponse>(`/sessoes-pomodoro/${id}/parar`, {
+      method: "PATCH",
+      body: { data, minutosRealizados },
+    });
+    return resposta.sessao;
+  },
 };
 
 export const resumosApi = {
