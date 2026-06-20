@@ -22,17 +22,32 @@ enum StatusSessaoPomodoro {
 }
 
 model Usuario {
-  id             String                @id @default(uuid())
-  nome           String?
-  email          String                @unique
-  senhaHash      String
-  criadoEm       DateTime              @default(now())
-  atualizadoEm   DateTime              @updatedAt
-  configuracao   ConfiguracaoPomodoro?
-  sessoes        SessaoPomodoro[]
-  resumosDiarios ResumoDiario[]
+  id                String                @id @default(uuid())
+  nome              String?
+  email             String                @unique
+  senhaHash         String
+  criadoEm          DateTime              @default(now())
+  atualizadoEm      DateTime              @updatedAt
+  configuracao      ConfiguracaoPomodoro?
+  sessoes           SessaoPomodoro[]
+  resumosDiarios    ResumoDiario[]
+  tokensAtualizacao TokenAtualizacao[]
 
   @@map("usuarios")
+}
+
+model TokenAtualizacao {
+  id         String    @id @default(uuid())
+  usuarioId  String
+  tokenHash  String    @unique
+  expiraEm   DateTime
+  revogadoEm DateTime?
+  criadoEm   DateTime  @default(now())
+  usuario    Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+  @@index([expiraEm])
+  @@map("tokens_atualizacao")
 }
 
 model ConfiguracaoPomodoro {
