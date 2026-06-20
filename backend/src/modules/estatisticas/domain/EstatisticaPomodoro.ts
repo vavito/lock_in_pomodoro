@@ -51,4 +51,15 @@ export class EstatisticaPomodoro {
       },
     )
   }
+
+  contarDiasUsados() {
+    return this.props.resumos.filter(
+      (resumo) =>
+        resumo.pomodorosRealizados > 0 ||
+        resumo.descansosCurtosRealizados > 0 ||
+        resumo.descansosLongosRealizados > 0 ||
+        resumo.tempoEstudandoMinutos > 0 ||
+        resumo.tempoDescansoMinutos > 0,
+    ).length
+  }
 }

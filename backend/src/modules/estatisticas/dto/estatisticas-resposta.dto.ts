@@ -15,6 +15,7 @@ type TotaisEstatisticaDTO = {
   descansosLongosRealizados: number
   tempoEstudandoMinutos: number
   tempoDescansoMinutos: number
+  diasUsados: number
 }
 
 export type EstatisticasRespostaDTO = {

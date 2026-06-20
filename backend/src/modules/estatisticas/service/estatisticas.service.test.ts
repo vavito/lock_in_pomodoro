@@ -29,6 +29,13 @@ function criarResumo(data: string, pomodorosRealizados: number) {
   })
 }
 
+function criarResumoZerado(data: string) {
+  return ResumoDiario.criar({
+    usuarioId: 'usuario-1',
+    data: new Date(`${data}T00:00:00.000Z`),
+  })
+}
+
 describe('estatisticas', () => {
   it('deve somar estatisticas do dia', async () => {
     const service = new BuscarEstatisticasService(
@@ -107,5 +114,23 @@ describe('estatisticas', () => {
     expect(estatisticas.inicio.toISOString().slice(0, 10)).toBe('2026-01-01')
     expect(estatisticas.fim.toISOString().slice(0, 10)).toBe('2026-12-31')
     expect(estatisticas.calcularTotais().pomodorosRealizados).toBe(3)
+  })
+
+  it('deve contar apenas dias com atividade', async () => {
+    const service = new BuscarEstatisticasService(
+      new EstatisticasRepositoryEmMemoria([
+        criarResumo('2026-06-01', 1),
+        criarResumoZerado('2026-06-02'),
+        criarResumo('2026-06-03', 2),
+      ]),
+    )
+
+    const estatisticas = await service.executar(
+      'usuario-1',
+      'mes',
+      new Date('2026-06-20T00:00:00.000Z'),
+    )
+
+    expect(estatisticas.contarDiasUsados()).toBe(2)
   })
 })

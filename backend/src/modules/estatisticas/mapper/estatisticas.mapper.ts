@@ -11,7 +11,10 @@ export class EstatisticasMapper {
         inicio: this.formatarData(estatistica.inicio),
         fim: this.formatarData(estatistica.fim),
       },
-      totais: estatistica.calcularTotais(),
+      totais: {
+        ...estatistica.calcularTotais(),
+        diasUsados: estatistica.contarDiasUsados(),
+      },
       dias: estatistica.resumos.map((resumo) => ({
         data: this.formatarData(resumo.data),
         pomodorosRealizados: resumo.pomodorosRealizados,
