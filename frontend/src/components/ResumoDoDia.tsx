@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { CampoNumero } from "@/components/CampoNumero";
 import { resumosApi } from "@/services/api";
 import type { ResumoDiario } from "@/types";
 import { formatarTempoMinutos, hojeYYYYMMDD } from "@/lib/data";
@@ -14,7 +16,6 @@ export function ResumoDoDia({ resumo, aoAtualizar }: Props) {
   const [curtos, setCurtos] = useState("0");
   const [longos, setLongos] = useState("0");
   const [salvando, setSalvando] = useState(false);
-  const [mensagem, setMensagem] = useState<string | null>(null);
   const [erros, setErros] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -22,6 +23,14 @@ export function ResumoDoDia({ resumo, aoAtualizar }: Props) {
     setCurtos(String(resumo?.descansosCurtosRealizados ?? 0));
     setLongos(String(resumo?.descansosLongosRealizados ?? 0));
   }, [resumo]);
+
+  const cancelarEdicao = () => {
+    setPoms(String(resumo?.pomodorosRealizados ?? 0));
+    setCurtos(String(resumo?.descansosCurtosRealizados ?? 0));
+    setLongos(String(resumo?.descansosLongosRealizados ?? 0));
+    setErros({});
+    setEditando(false);
+  };
 
   const validarContador = (valor: string, rotulo: string) => {
     if (valor.trim() === "") return 0;
@@ -54,18 +63,17 @@ export function ResumoDoDia({ resumo, aoAtualizar }: Props) {
     }
 
     setSalvando(true);
-    setMensagem(null);
     try {
       await resumosApi.atualizar(hojeYYYYMMDD(), {
         pomodorosRealizados: pomodoros,
         descansosCurtosRealizados: descansosCurtos,
         descansosLongosRealizados: descansosLongos,
       });
-      setMensagem("Contadores atualizados.");
+      toast.success("Contadores atualizados com sucesso.");
       setEditando(false);
       await aoAtualizar();
     } catch (e) {
-      setMensagem((e as Error).message);
+      toast.error((e as Error).message);
     } finally {
       setSalvando(false);
     }
@@ -111,16 +119,17 @@ export function ResumoDoDia({ resumo, aoAtualizar }: Props) {
           />
         </div>
 
-        <button
-          onClick={() => {
-            setMensagem(null);
-            setErros({});
-            setEditando((v) => !v);
-          }}
-          className="self-start rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground sm:self-auto"
-        >
-          {editando ? "Cancelar" : "Editar"}
-        </button>
+        {!editando && (
+          <button
+            onClick={() => {
+              setErros({});
+              setEditando(true);
+            }}
+            className="self-start rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground sm:self-auto"
+          >
+            Editar
+          </button>
+        )}
       </div>
 
       {editando && (
@@ -129,44 +138,49 @@ export function ResumoDoDia({ resumo, aoAtualizar }: Props) {
             <CampoNumero
               rotulo="Pomodoros"
               valor={poms}
-              setValor={setPoms}
               min={0}
               max={1000}
               erro={erros.poms}
+              onChange={setPoms}
             />
             <CampoNumero
               rotulo="Descansos Curtos"
               valor={curtos}
-              setValor={setCurtos}
               min={0}
               max={1000}
               erro={erros.curtos}
+              onChange={setCurtos}
             />
             <CampoNumero
               rotulo="Descansos Longos"
               valor={longos}
-              setValor={setLongos}
               min={0}
               max={1000}
               erro={erros.longos}
+              onChange={setLongos}
             />
           </div>
-          <div className="mt-4 flex items-center justify-between">
-            <p className="text-xs text-muted-foreground">
-              {mensagem ?? "Limite: 0 a 1000 por contador."}
-            </p>
-            <button
-              onClick={salvar}
-              disabled={salvando}
-              className="cursor-pointer rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90 disabled:opacity-50"
-            >
-              {salvando ? "Salvando..." : "Salvar"}
-            </button>
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-xs text-muted-foreground">Limite: 0 a 1000 por contador.</p>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={salvar}
+                disabled={salvando}
+                className="cursor-pointer rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90 disabled:opacity-50"
+              >
+                {salvando ? "Salvando..." : "Salvar"}
+              </button>
+              <button
+                onClick={cancelarEdicao}
+                disabled={salvando}
+                className="cursor-pointer rounded-lg border border-border bg-white px-4 py-2 text-sm font-semibold text-black transition-all hover:bg-white/90 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-white/90"
+              >
+                Cancelar
+              </button>
+            </div>
           </div>
         </div>
       )}
-
-      {!editando && mensagem && <p className="mt-3 text-xs text-muted-foreground">{mensagem}</p>}
     </div>
   );
 }
@@ -191,61 +205,5 @@ function Metrica({
         {rotulo}
       </span>
     </div>
-  );
-}
-
-function CampoNumero({
-  rotulo,
-  valor,
-  setValor,
-  min,
-  max,
-  erro,
-}: {
-  rotulo: string;
-  valor: string;
-  setValor: (valor: string) => void;
-  min: number;
-  max: number;
-  erro?: string;
-}) {
-  const alterar = (novoValor: string) => {
-    if (/^\d*$/.test(novoValor)) setValor(novoValor);
-  };
-
-  const somar = (quantidade: number) => {
-    const atual = valor.trim() === "" ? min : Number(valor);
-    const proximo = Math.max(min, Math.min(max, atual + quantidade));
-    setValor(String(proximo));
-  };
-
-  return (
-    <label className="flex flex-col gap-1.5">
-      <span className="text-xs font-medium text-muted-foreground">{rotulo}</span>
-      <div className="flex overflow-hidden rounded-lg border border-border bg-background focus-within:ring-2 focus-within:ring-primary">
-        <button
-          type="button"
-          onClick={() => somar(-1)}
-          className="w-10 border-r border-border text-sm font-semibold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-        >
-          -
-        </button>
-        <input
-          type="text"
-          inputMode="numeric"
-          value={valor}
-          onChange={(e) => alterar(e.target.value)}
-          className="min-w-0 flex-1 bg-transparent px-3 py-2 text-center text-sm text-foreground outline-none"
-        />
-        <button
-          type="button"
-          onClick={() => somar(1)}
-          className="w-10 border-l border-border text-sm font-semibold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-        >
-          +
-        </button>
-      </div>
-      {erro && <span className="text-xs text-destructive">{erro}</span>}
-    </label>
   );
 }

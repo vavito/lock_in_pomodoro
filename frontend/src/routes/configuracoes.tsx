@@ -1,6 +1,8 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
+import { CampoNumero } from "@/components/CampoNumero";
 import { useAuth } from "@/contexts/AuthContext";
 import { configuracoesApi } from "@/services/api";
 import type { Configuracao } from "@/types";
@@ -14,7 +16,7 @@ type CamposNumericos = {
 
 export const Route = createFileRoute("/configuracoes")({
   ssr: false,
-  head: () => ({ meta: [{ title: "Configurações — Lock In Pomodoro" }] }),
+  head: () => ({ meta: [{ title: "Configurações - Lock In Pomodoro" }] }),
   component: ConfiguracoesPage,
 });
 
@@ -22,10 +24,10 @@ function ConfiguracoesPage() {
   const { logado, carregando } = useAuth();
   const router = useRouter();
   const [config, setConfig] = useState<Configuracao | null>(null);
+  const [configSalva, setConfigSalva] = useState<Configuracao | null>(null);
   const [camposNumericos, setCamposNumericos] = useState<CamposNumericos | null>(null);
   const [carregandoConfig, setCarregandoConfig] = useState(true);
   const [salvando, setSalvando] = useState(false);
-  const [mensagem, setMensagem] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [errosCampos, setErrosCampos] = useState<Partial<CamposNumericos>>({});
 
@@ -35,10 +37,12 @@ function ConfiguracoesPage() {
 
   useEffect(() => {
     if (!logado) return;
+
     (async () => {
       try {
         const c = await configuracoesApi.obter();
         setConfig(c);
+        setConfigSalva(c);
         setCamposNumericos(camposNumericosDaConfig(c));
       } catch (e) {
         setErro((e as Error).message);
@@ -61,10 +65,18 @@ function ConfiguracoesPage() {
   };
 
   const atualizarCampoNumerico = (chave: keyof CamposNumericos, valor: string) => {
-    setMensagem(null);
     setErro(null);
     setErrosCampos((atual) => ({ ...atual, [chave]: undefined }));
     setCamposNumericos((campos) => (campos ? { ...campos, [chave]: valor } : campos));
+  };
+
+  const cancelarAlteracoes = () => {
+    if (!configSalva) return;
+
+    setConfig(configSalva);
+    setCamposNumericos(camposNumericosDaConfig(configSalva));
+    setErrosCampos({});
+    setErro(null);
   };
 
   const validarNumero = (valor: string, min: number, max: number, rotulo: string) => {
@@ -103,7 +115,7 @@ function ConfiguracoesPage() {
       camposNumericos.pomodorosParaDescansoLongo,
       1,
       99,
-      "Pomodoros ate descanso longo",
+      "Pomodoros até descanso longo",
     );
 
     const novosErros = {
@@ -128,7 +140,6 @@ function ConfiguracoesPage() {
     }
 
     setSalvando(true);
-    setMensagem(null);
     setErro(null);
     try {
       const atualizado = await configuracoesApi.atualizar({
@@ -140,10 +151,13 @@ function ConfiguracoesPage() {
         iniciarPomodoroAutomaticamente: config.iniciarPomodoroAutomaticamente,
       });
       setConfig(atualizado);
+      setConfigSalva(atualizado);
       setCamposNumericos(camposNumericosDaConfig(atualizado));
-      setMensagem("Configurações salvas.");
+      toast.success("Configurações salvas com sucesso.");
     } catch (e) {
-      setErro((e as Error).message);
+      const mensagem = (e as Error).message;
+      setErro(mensagem);
+      toast.error(mensagem);
     } finally {
       setSalvando(false);
     }
@@ -209,78 +223,31 @@ function ConfiguracoesPage() {
               />
             </div>
 
-            <div className="mt-8 flex items-center justify-between">
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-xs text-muted-foreground">
-                {mensagem ?? (erro ? erro : "Tempos: 1 a 59 min. Pomodoros: 1 a 99.")}
+                {erro ? erro : "Tempos: 1 a 59 min. Pomodoros: 1 a 99."}
               </p>
-              <button
-                onClick={salvar}
-                disabled={salvando}
-                className="cursor-pointer rounded-2xl bg-primary px-6 py-2.5 text-sm font-bold tracking-widest text-primary-foreground transition-all hover:opacity-90 disabled:opacity-50"
-              >
-                {salvando ? "SALVANDO..." : "SALVAR"}
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={salvar}
+                  disabled={salvando}
+                  className="cursor-pointer rounded-2xl bg-primary px-6 py-2.5 text-sm font-bold tracking-widest text-primary-foreground transition-all hover:opacity-90 disabled:opacity-50"
+                >
+                  {salvando ? "SALVANDO..." : "SALVAR"}
+                </button>
+                <button
+                  onClick={cancelarAlteracoes}
+                  disabled={salvando}
+                  className="cursor-pointer rounded-2xl border border-border bg-white px-6 py-2.5 text-sm font-bold tracking-widest text-black transition-all hover:bg-white/90 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-white/90"
+                >
+                  CANCELAR
+                </button>
+              </div>
             </div>
           </div>
         )}
       </div>
     </AppShell>
-  );
-}
-
-function CampoNumero({
-  rotulo,
-  valor,
-  min,
-  max,
-  erro,
-  onChange,
-}: {
-  rotulo: string;
-  valor: string;
-  min: number;
-  max: number;
-  erro?: string;
-  onChange: (valor: string) => void;
-}) {
-  const alterar = (novoValor: string) => {
-    if (/^\d*$/.test(novoValor)) onChange(novoValor);
-  };
-
-  const somar = (quantidade: number) => {
-    const atual = valor.trim() === "" ? min : Number(valor);
-    const proximo = Math.max(min, Math.min(max, atual + quantidade));
-    onChange(String(proximo));
-  };
-
-  return (
-    <label className="flex flex-col gap-1.5">
-      <span className="text-xs font-medium text-muted-foreground">{rotulo}</span>
-      <div className="flex overflow-hidden rounded-lg border border-border bg-background focus-within:ring-2 focus-within:ring-primary">
-        <button
-          type="button"
-          onClick={() => somar(-1)}
-          className="w-10 border-r border-border text-sm font-semibold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-        >
-          -
-        </button>
-        <input
-          type="text"
-          inputMode="numeric"
-          value={valor}
-          onChange={(e) => alterar(e.target.value)}
-          className="min-w-0 flex-1 bg-transparent px-3 py-2.5 text-center text-sm text-foreground outline-none"
-        />
-        <button
-          type="button"
-          onClick={() => somar(1)}
-          className="w-10 border-l border-border text-sm font-semibold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-        >
-          +
-        </button>
-      </div>
-      {erro && <span className="text-xs text-destructive">{erro}</span>}
-    </label>
   );
 }
 
