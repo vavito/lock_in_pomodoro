@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { emailValido, senhaValida, validarCamposAuth, type ErrosAuth } from "@/lib/validacoes-auth";
 
 export const Route = createFileRoute("/login")({
   ssr: false,
@@ -15,6 +16,7 @@ function LoginPage() {
   const [senha, setSenha] = useState("");
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [errosCampos, setErrosCampos] = useState<ErrosAuth>({});
 
   useEffect(() => {
     if (logado) router.navigate({ to: "/" });
@@ -23,6 +25,13 @@ function LoginPage() {
   const enviar = async (e: React.FormEvent) => {
     e.preventDefault();
     setErro(null);
+    const erros = validarCamposAuth(email, senha);
+
+    if (Object.keys(erros).length > 0) {
+      setErrosCampos(erros);
+      return;
+    }
+
     setCarregando(true);
     try {
       await login(email, senha);
@@ -34,10 +43,33 @@ function LoginPage() {
     }
   };
 
+  const alterarEmail = (valor: string) => {
+    setEmail(valor);
+
+    if (errosCampos.email) {
+      setErrosCampos((errosAtuais) => ({
+        ...errosAtuais,
+        email: emailValido(valor) ? undefined : "Informe um e-mail valido.",
+      }));
+    }
+  };
+
+  const alterarSenha = (valor: string) => {
+    setSenha(valor);
+
+    if (errosCampos.senha) {
+      setErrosCampos((errosAtuais) => ({
+        ...errosAtuais,
+        senha: senhaValida(valor) ? undefined : "A senha deve ter no minimo 8 caracteres.",
+      }));
+    }
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-6">
       <form
         onSubmit={enviar}
+        noValidate
         className="w-full max-w-sm rounded-3xl border border-border bg-card p-8 shadow-2xl"
       >
         <div className="mb-8 flex items-center gap-2">
@@ -56,22 +88,47 @@ function LoginPage() {
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => alterarEmail(e.target.value)}
               required
               placeholder="voce@email.com"
-              className="rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary"
+              aria-invalid={!!errosCampos.email}
+              aria-describedby={errosCampos.email ? "login-email-erro" : undefined}
+              className={
+                "rounded-lg border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 " +
+                (errosCampos.email
+                  ? "border-destructive focus:ring-destructive"
+                  : "border-border focus:ring-primary")
+              }
             />
+            {errosCampos.email && (
+              <span id="login-email-erro" className="text-xs text-destructive">
+                {errosCampos.email}
+              </span>
+            )}
           </label>
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-medium text-muted-foreground">Senha</span>
             <input
               type="password"
               value={senha}
-              onChange={(e) => setSenha(e.target.value)}
+              onChange={(e) => alterarSenha(e.target.value)}
               required
+              minLength={8}
               placeholder="••••••••"
-              className="rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary"
+              aria-invalid={!!errosCampos.senha}
+              aria-describedby={errosCampos.senha ? "login-senha-erro" : undefined}
+              className={
+                "rounded-lg border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 " +
+                (errosCampos.senha
+                  ? "border-destructive focus:ring-destructive"
+                  : "border-border focus:ring-primary")
+              }
             />
+            {errosCampos.senha && (
+              <span id="login-senha-erro" className="text-xs text-destructive">
+                {errosCampos.senha}
+              </span>
+            )}
           </label>
         </div>
 

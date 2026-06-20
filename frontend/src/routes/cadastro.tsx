@@ -1,6 +1,11 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { emailValido, senhaValida, validarCamposAuth, type ErrosAuth } from "@/lib/validacoes-auth";
+
+type ErrosCadastro = ErrosAuth & {
+  nome?: string;
+};
 
 export const Route = createFileRoute("/cadastro")({
   ssr: false,
@@ -16,6 +21,7 @@ function CadastroPage() {
   const [senha, setSenha] = useState("");
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [errosCampos, setErrosCampos] = useState<ErrosCadastro>({});
 
   useEffect(() => {
     if (logado) router.navigate({ to: "/" });
@@ -24,6 +30,17 @@ function CadastroPage() {
   const enviar = async (e: React.FormEvent) => {
     e.preventDefault();
     setErro(null);
+    const erros: ErrosCadastro = validarCamposAuth(email, senha);
+
+    if (!nome.trim()) {
+      erros.nome = "Informe seu nome.";
+    }
+
+    if (Object.keys(erros).length > 0) {
+      setErrosCampos(erros);
+      return;
+    }
+
     setCarregando(true);
     try {
       await cadastro(nome, email, senha);
@@ -35,10 +52,44 @@ function CadastroPage() {
     }
   };
 
+  const alterarNome = (valor: string) => {
+    setNome(valor);
+
+    if (errosCampos.nome) {
+      setErrosCampos((errosAtuais) => ({
+        ...errosAtuais,
+        nome: valor.trim() ? undefined : "Informe seu nome.",
+      }));
+    }
+  };
+
+  const alterarEmail = (valor: string) => {
+    setEmail(valor);
+
+    if (errosCampos.email) {
+      setErrosCampos((errosAtuais) => ({
+        ...errosAtuais,
+        email: emailValido(valor) ? undefined : "Informe um e-mail valido.",
+      }));
+    }
+  };
+
+  const alterarSenha = (valor: string) => {
+    setSenha(valor);
+
+    if (errosCampos.senha) {
+      setErrosCampos((errosAtuais) => ({
+        ...errosAtuais,
+        senha: senhaValida(valor) ? undefined : "A senha deve ter no minimo 8 caracteres.",
+      }));
+    }
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-6">
       <form
         onSubmit={enviar}
+        noValidate
         className="w-full max-w-sm rounded-3xl border border-border bg-card p-8 shadow-2xl"
       >
         <div className="mb-8 flex items-center gap-2">
@@ -57,31 +108,67 @@ function CadastroPage() {
             <input
               type="text"
               value={nome}
-              onChange={(e) => setNome(e.target.value)}
+              onChange={(e) => alterarNome(e.target.value)}
               required
-              className="rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary"
+              aria-invalid={!!errosCampos.nome}
+              aria-describedby={errosCampos.nome ? "cadastro-nome-erro" : undefined}
+              className={
+                "rounded-lg border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 " +
+                (errosCampos.nome
+                  ? "border-destructive focus:ring-destructive"
+                  : "border-border focus:ring-primary")
+              }
             />
+            {errosCampos.nome && (
+              <span id="cadastro-nome-erro" className="text-xs text-destructive">
+                {errosCampos.nome}
+              </span>
+            )}
           </label>
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-medium text-muted-foreground">E-mail</span>
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => alterarEmail(e.target.value)}
               required
-              className="rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary"
+              aria-invalid={!!errosCampos.email}
+              aria-describedby={errosCampos.email ? "cadastro-email-erro" : undefined}
+              className={
+                "rounded-lg border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 " +
+                (errosCampos.email
+                  ? "border-destructive focus:ring-destructive"
+                  : "border-border focus:ring-primary")
+              }
             />
+            {errosCampos.email && (
+              <span id="cadastro-email-erro" className="text-xs text-destructive">
+                {errosCampos.email}
+              </span>
+            )}
           </label>
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-medium text-muted-foreground">Senha</span>
             <input
               type="password"
               value={senha}
-              onChange={(e) => setSenha(e.target.value)}
+              onChange={(e) => alterarSenha(e.target.value)}
               required
-              minLength={6}
-              className="rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary"
+              minLength={8}
+              aria-invalid={!!errosCampos.senha}
+              aria-describedby={errosCampos.senha ? "cadastro-senha-erro" : undefined}
+              className={
+                "rounded-lg border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 " +
+                (errosCampos.senha
+                  ? "border-destructive focus:ring-destructive"
+                  : "border-border focus:ring-primary")
+              }
             />
+            {errosCampos.senha && (
+              <span id="cadastro-senha-erro" className="text-xs text-destructive">
+                {errosCampos.senha}
+              </span>
+            )}
           </label>
         </div>
 
