@@ -97,9 +97,11 @@ export async function request<T>(path: string, opts: RequestOptions = {}): Promi
   const { method = "GET", body, autenticada = true } = opts;
 
   const fazer = async (): Promise<Response> => {
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-    };
+    const headers: Record<string, string> = {};
+
+    if (body !== undefined) {
+      headers["Content-Type"] = "application/json";
+    }
 
     if (autenticada) {
       const token = obterToken();
