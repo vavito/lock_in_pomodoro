@@ -10,28 +10,56 @@ type Props = {
 
 export function ResumoDoDia({ resumo, aoAtualizar }: Props) {
   const [editando, setEditando] = useState(false);
-  const [poms, setPoms] = useState(0);
-  const [curtos, setCurtos] = useState(0);
-  const [longos, setLongos] = useState(0);
+  const [poms, setPoms] = useState("0");
+  const [curtos, setCurtos] = useState("0");
+  const [longos, setLongos] = useState("0");
   const [salvando, setSalvando] = useState(false);
   const [mensagem, setMensagem] = useState<string | null>(null);
+  const [erros, setErros] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    setPoms(resumo?.pomodorosRealizados ?? 0);
-    setCurtos(resumo?.descansosCurtosRealizados ?? 0);
-    setLongos(resumo?.descansosLongosRealizados ?? 0);
+    setPoms(String(resumo?.pomodorosRealizados ?? 0));
+    setCurtos(String(resumo?.descansosCurtosRealizados ?? 0));
+    setLongos(String(resumo?.descansosLongosRealizados ?? 0));
   }, [resumo]);
 
-  const limitar = (n: number) => Math.max(0, Math.min(1000, Math.floor(n || 0)));
+  const validarContador = (valor: string, rotulo: string) => {
+    if (valor.trim() === "") return `${rotulo} deve estar entre 0 e 1000.`;
+
+    const numero = Number(valor);
+    if (!Number.isInteger(numero) || numero < 0 || numero > 1000) {
+      return `${rotulo} deve estar entre 0 e 1000.`;
+    }
+
+    return numero;
+  };
 
   const salvar = async () => {
+    const pomodoros = validarContador(poms, "Pomodoros");
+    const descansosCurtos = validarContador(curtos, "Descansos curtos");
+    const descansosLongos = validarContador(longos, "Descansos longos");
+    const novosErros = {
+      poms: typeof pomodoros === "string" ? pomodoros : "",
+      curtos: typeof descansosCurtos === "string" ? descansosCurtos : "",
+      longos: typeof descansosLongos === "string" ? descansosLongos : "",
+    };
+
+    setErros(novosErros);
+    if (
+      typeof pomodoros === "string" ||
+      typeof descansosCurtos === "string" ||
+      typeof descansosLongos === "string"
+    ) {
+      return;
+    }
+
     setSalvando(true);
     setMensagem(null);
     try {
       await resumosApi.atualizar(hojeYYYYMMDD(), {
-        pomodorosRealizados: limitar(poms),
-        descansosCurtosRealizados: limitar(curtos),
-        descansosLongosRealizados: limitar(longos),
+        pomodorosRealizados: pomodoros,
+        descansosCurtosRealizados: descansosCurtos,
+        descansosLongosRealizados: descansosLongos,
       });
       setMensagem("Contadores atualizados.");
       setEditando(false);
@@ -84,7 +112,11 @@ export function ResumoDoDia({ resumo, aoAtualizar }: Props) {
         </div>
 
         <button
-          onClick={() => setEditando((v) => !v)}
+          onClick={() => {
+            setMensagem(null);
+            setErros({});
+            setEditando((v) => !v);
+          }}
           className="self-start rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground sm:self-auto"
         >
           {editando ? "Cancelar" : "Editar"}
@@ -94,9 +126,30 @@ export function ResumoDoDia({ resumo, aoAtualizar }: Props) {
       {editando && (
         <div className="mt-6 rounded-2xl border border-border bg-card p-6">
           <div className="grid gap-4 sm:grid-cols-3">
-            <CampoNumero rotulo="Pomodoros" valor={poms} setValor={setPoms} />
-            <CampoNumero rotulo="Descansos Curtos" valor={curtos} setValor={setCurtos} />
-            <CampoNumero rotulo="Descansos Longos" valor={longos} setValor={setLongos} />
+            <CampoNumero
+              rotulo="Pomodoros"
+              valor={poms}
+              setValor={setPoms}
+              min={0}
+              max={1000}
+              erro={erros.poms}
+            />
+            <CampoNumero
+              rotulo="Descansos Curtos"
+              valor={curtos}
+              setValor={setCurtos}
+              min={0}
+              max={1000}
+              erro={erros.curtos}
+            />
+            <CampoNumero
+              rotulo="Descansos Longos"
+              valor={longos}
+              setValor={setLongos}
+              min={0}
+              max={1000}
+              erro={erros.longos}
+            />
           </div>
           <div className="mt-4 flex items-center justify-between">
             <p className="text-xs text-muted-foreground">
@@ -145,22 +198,54 @@ function CampoNumero({
   rotulo,
   valor,
   setValor,
+  min,
+  max,
+  erro,
 }: {
   rotulo: string;
-  valor: number;
-  setValor: (n: number) => void;
+  valor: string;
+  setValor: (valor: string) => void;
+  min: number;
+  max: number;
+  erro?: string;
 }) {
+  const alterar = (novoValor: string) => {
+    if (/^\d*$/.test(novoValor)) setValor(novoValor);
+  };
+
+  const somar = (quantidade: number) => {
+    const atual = valor.trim() === "" ? min : Number(valor);
+    const proximo = Math.max(min, Math.min(max, atual + quantidade));
+    setValor(String(proximo));
+  };
+
   return (
-    <label className="flex flex-col gap-1">
+    <label className="flex flex-col gap-1.5">
       <span className="text-xs font-medium text-muted-foreground">{rotulo}</span>
-      <input
-        type="number"
-        min={0}
-        max={1000}
-        value={valor}
-        onChange={(e) => setValor(Number(e.target.value))}
-        className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary"
-      />
+      <div className="flex overflow-hidden rounded-lg border border-border bg-background focus-within:ring-2 focus-within:ring-primary">
+        <button
+          type="button"
+          onClick={() => somar(-1)}
+          className="w-10 border-r border-border text-sm font-semibold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+        >
+          -
+        </button>
+        <input
+          type="text"
+          inputMode="numeric"
+          value={valor}
+          onChange={(e) => alterar(e.target.value)}
+          className="min-w-0 flex-1 bg-transparent px-3 py-2 text-center text-sm text-foreground outline-none"
+        />
+        <button
+          type="button"
+          onClick={() => somar(1)}
+          className="w-10 border-l border-border text-sm font-semibold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+        >
+          +
+        </button>
+      </div>
+      {erro && <span className="text-xs text-destructive">{erro}</span>}
     </label>
   );
 }
