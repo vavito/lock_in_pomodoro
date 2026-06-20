@@ -20,9 +20,11 @@ export function formatarMMSS(segundos: number): string {
 }
 
 export function formatarTempoMinutos(minutos: number): string {
-  if (minutos < 60) return `${minutos}m`;
-  const h = Math.floor(minutos / 60);
-  const m = minutos % 60;
+  const minutosValidos = Number.isFinite(minutos) && minutos > 0 ? Math.floor(minutos) : 0;
+  const h = Math.floor(minutosValidos / 60);
+  const m = minutosValidos % 60;
+  if (h === 0 && m === 0) return "0h 0min";
+  if (h === 0) return `${m}min`;
   if (m === 0) return `${h}h`;
-  return `${h}h ${m}m`;
+  return `${h}h ${m}min`;
 }

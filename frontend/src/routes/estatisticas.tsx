@@ -125,7 +125,7 @@ function EstatisticasPage() {
               ) : (
                 <ul className="divide-y divide-border">
                   {stats.dias.map((d) => (
-                    <li key={d.id} className="grid grid-cols-2 gap-2 py-3 text-sm sm:grid-cols-5">
+                    <li key={d.data} className="grid grid-cols-2 gap-2 py-3 text-sm sm:grid-cols-5">
                       <span className="font-mono-timer text-foreground">{d.data}</span>
                       <span className="text-muted-foreground">{d.pomodorosRealizados} pomos</span>
                       <span className="text-muted-foreground">

@@ -1,6 +1,7 @@
 import type {
   AuthResponse,
   Configuracao,
+  EstatisticaDia,
   Estatisticas,
   ResumoDiario,
   Sessao,
@@ -35,9 +36,42 @@ type ResumoResponse = {
   resumo: ResumoDiario;
 };
 
-type EstatisticasResponse = {
-  estatisticas: Estatisticas;
+type EstatisticasBackendResponse = {
+  estatisticas: {
+    totais?: Partial<Omit<Estatisticas, "dias">>;
+    dias?: Partial<EstatisticaDia>[];
+  };
 };
+
+function numeroSeguro(valor: unknown): number {
+  return typeof valor === "number" && Number.isFinite(valor) ? valor : 0;
+}
+
+function textoSeguro(valor: unknown): string {
+  return typeof valor === "string" ? valor : "";
+}
+
+function mapearEstatisticas(resposta: EstatisticasBackendResponse): Estatisticas {
+  const totais = resposta.estatisticas.totais ?? {};
+  const dias = resposta.estatisticas.dias ?? [];
+
+  return {
+    pomodorosRealizados: numeroSeguro(totais.pomodorosRealizados),
+    descansosCurtosRealizados: numeroSeguro(totais.descansosCurtosRealizados),
+    descansosLongosRealizados: numeroSeguro(totais.descansosLongosRealizados),
+    tempoEstudandoMinutos: numeroSeguro(totais.tempoEstudandoMinutos),
+    tempoDescansoMinutos: numeroSeguro(totais.tempoDescansoMinutos),
+    diasUsados: numeroSeguro(totais.diasUsados),
+    dias: dias.map((dia) => ({
+      data: textoSeguro(dia.data),
+      pomodorosRealizados: numeroSeguro(dia.pomodorosRealizados),
+      descansosCurtosRealizados: numeroSeguro(dia.descansosCurtosRealizados),
+      descansosLongosRealizados: numeroSeguro(dia.descansosLongosRealizados),
+      tempoEstudandoMinutos: numeroSeguro(dia.tempoEstudandoMinutos),
+      tempoDescansoMinutos: numeroSeguro(dia.tempoDescansoMinutos),
+    })),
+  };
+}
 
 export function obterToken(): string | null {
   if (typeof window === "undefined") return null;
@@ -234,9 +268,9 @@ export const resumosApi = {
 
 export const estatisticasApi = {
   obter: async (periodo: "dia" | "semana" | "mes" | "ano", data: string) => {
-    const resposta = await request<EstatisticasResponse>(
+    const resposta = await request<EstatisticasBackendResponse>(
       `/estatisticas?periodo=${periodo}&data=${encodeURIComponent(data)}`,
     );
-    return resposta.estatisticas;
+    return mapearEstatisticas(resposta);
   },
 };
