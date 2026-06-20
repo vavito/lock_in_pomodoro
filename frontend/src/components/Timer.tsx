@@ -63,6 +63,7 @@ export function Timer() {
   const [sessaoId, setSessaoId] = useState<string | null>(null);
   const [rodando, setRodando] = useState(false);
   const [timerCongelado, setTimerCongelado] = useState(false);
+  const [minutosParciaisSalvos, setMinutosParciaisSalvos] = useState(0);
   const [segundosRestantes, setSegundosRestantes] = useState(25 * 60);
   const [erro, setErro] = useState<string | null>(null);
   const intervaloRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -120,14 +121,17 @@ export function Timer() {
   }, []);
 
   const iniciarComTipo = useCallback(
-    async (t: TipoSessao) => {
+    async (t: TipoSessao, manterTempoAtual = false) => {
       setErro(null);
       try {
         const sessao = await sessoesApi.criar(t);
         setTipo(t);
         setSessaoId(sessao.id);
         setTimerCongelado(false);
-        setSegundosRestantes(duracaoDeMinutos(t, config) * 60);
+        if (!manterTempoAtual) {
+          setSegundosRestantes(duracaoDeMinutos(t, config) * 60);
+          setMinutosParciaisSalvos(0);
+        }
         setRodando(true);
       } catch (e) {
         setErro((e as Error).message);
@@ -154,6 +158,7 @@ export function Timer() {
             setSessaoId(null);
             setRodando(false);
             setTimerCongelado(false);
+            setMinutosParciaisSalvos(0);
             setSegundosRestantes(duracaoDeMinutos(proximo, config) * 60);
             if (config.iniciarDescansoAutomaticamente) {
               setTimeout(() => iniciarComTipo(proximo), 600);
@@ -164,6 +169,7 @@ export function Timer() {
             setSessaoId(null);
             setRodando(false);
             setTimerCongelado(false);
+            setMinutosParciaisSalvos(0);
             setSegundosRestantes(duracaoDeMinutos(proximo, config) * 60);
             if (config.iniciarPomodoroAutomaticamente) {
               setTimeout(() => iniciarComTipo(proximo), 600);
@@ -196,18 +202,20 @@ export function Timer() {
     return () => limparIntervalo();
   }, [rodando, sessaoId, concluirSessao]);
 
-  const iniciar = () => iniciarComTipo(tipo);
+  const iniciar = () => iniciarComTipo(tipo, timerCongelado);
 
   const parar = async () => {
     limparIntervalo();
     setRodando(false);
     const id = sessaoId;
-    const minutosRealizados = Math.ceil((totalSegundos - segundosRestantes) / 60);
+    const minutosRealizados = Math.floor((totalSegundos - segundosRestantes) / 60);
+    const minutosParaSalvar = Math.max(0, minutosRealizados - minutosParciaisSalvos);
     setSessaoId(null);
     setTimerCongelado(true);
     if (id) {
       try {
-        await sessoesApi.parar(id, hojeYYYYMMDD(), Math.max(0, minutosRealizados));
+        await sessoesApi.parar(id, hojeYYYYMMDD(), minutosParaSalvar);
+        setMinutosParciaisSalvos(minutosRealizados);
         await recarregarResumo();
       } catch (e) {
         setErro((e as Error).message);
@@ -239,6 +247,7 @@ export function Timer() {
             onClick={() => {
               if (rodando) return;
               setTimerCongelado(false);
+              setMinutosParciaisSalvos(0);
               setTipo(a.tipo);
             }}
             disabled={rodando && tipo !== a.tipo}
