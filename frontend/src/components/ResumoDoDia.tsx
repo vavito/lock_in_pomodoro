@@ -32,21 +32,21 @@ export function ResumoDoDia({ resumo, aoAtualizar }: Props) {
     setEditando(false);
   };
 
-  const validarContador = (valor: string, rotulo: string) => {
+  const validarContador = (valor: string) => {
     if (valor.trim() === "") return 0;
 
     const numero = Number(valor);
     if (!Number.isInteger(numero) || numero < 0 || numero > 1000) {
-      return `${rotulo} deve estar entre 0 e 1000.`;
+      return "O valor inserido deve estar entre 0 e 1000.";
     }
 
     return numero;
   };
 
   const salvar = async () => {
-    const pomodoros = validarContador(poms, "Pomodoros");
-    const descansosCurtos = validarContador(curtos, "Descansos curtos");
-    const descansosLongos = validarContador(longos, "Descansos longos");
+    const pomodoros = validarContador(poms);
+    const descansosCurtos = validarContador(curtos);
+    const descansosLongos = validarContador(longos);
     const novosErros = {
       poms: typeof pomodoros === "string" ? pomodoros : "",
       curtos: typeof descansosCurtos === "string" ? descansosCurtos : "",
@@ -119,17 +119,17 @@ export function ResumoDoDia({ resumo, aoAtualizar }: Props) {
           />
         </div>
 
-        {!editando && (
-          <button
-            onClick={() => {
-              setErros({});
-              setEditando(true);
-            }}
-            className="self-start rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground sm:self-auto"
-          >
-            Editar
-          </button>
-        )}
+        <button
+          onClick={() => {
+            if (editando) return;
+            setErros({});
+            setEditando(true);
+          }}
+          disabled={editando}
+          className="w-16 self-start rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground disabled:cursor-default disabled:opacity-40 disabled:hover:text-muted-foreground sm:self-auto"
+        >
+          Editar
+        </button>
       </div>
 
       {editando && (
