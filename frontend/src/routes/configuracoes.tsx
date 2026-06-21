@@ -79,12 +79,12 @@ function ConfiguracoesPage() {
     setErro(null);
   };
 
-  const validarNumero = (valor: string, min: number, max: number, rotulo: string) => {
-    if (valor.trim() === "") return `${rotulo} deve estar entre ${min} e ${max}.`;
+  const validarNumero = (valor: string, min: number, max: number) => {
+    if (valor.trim() === "") return `O valor deve estar entre ${min} e ${max}.`;
 
     const numero = Number(valor);
     if (!Number.isInteger(numero) || numero < min || numero > max) {
-      return `${rotulo} deve estar entre ${min} e ${max}.`;
+      return `O valor deve estar entre ${min} e ${max}.`;
     }
 
     return numero;
@@ -93,29 +93,21 @@ function ConfiguracoesPage() {
   const salvar = async () => {
     if (!config || !camposNumericos) return;
 
-    const tempoPomodoroMinutos = validarNumero(
-      camposNumericos.tempoPomodoroMinutos,
-      1,
-      59,
-      "Pomodoro",
-    );
+    const tempoPomodoroMinutos = validarNumero(camposNumericos.tempoPomodoroMinutos, 1, 59);
     const tempoDescansoCurtoMinutos = validarNumero(
       camposNumericos.tempoDescansoCurtoMinutos,
       1,
       59,
-      "Descanso curto",
     );
     const tempoDescansoLongoMinutos = validarNumero(
       camposNumericos.tempoDescansoLongoMinutos,
       1,
       59,
-      "Descanso longo",
     );
     const pomodorosParaDescansoLongo = validarNumero(
       camposNumericos.pomodorosParaDescansoLongo,
       1,
       99,
-      "Pomodoros até descanso longo",
     );
 
     const novosErros = {

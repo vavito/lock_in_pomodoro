@@ -17,7 +17,7 @@ const PERIODOS: { valor: Periodo; rotulo: string }[] = [
 
 export const Route = createFileRoute("/estatisticas")({
   ssr: false,
-  head: () => ({ meta: [{ title: "Estatísticas — Lock In Pomodoro" }] }),
+  head: () => ({ meta: [{ title: "Estatisticas - Lock In Pomodoro" }] }),
   component: EstatisticasPage,
 });
 
@@ -36,9 +36,11 @@ function EstatisticasPage() {
 
   useEffect(() => {
     if (!logado) return;
+
     let ativo = true;
     setCarregandoStats(true);
     setErro(null);
+
     (async () => {
       try {
         const s = await estatisticasApi.obter(periodo, data);
@@ -49,6 +51,7 @@ function EstatisticasPage() {
         if (ativo) setCarregandoStats(false);
       }
     })();
+
     return () => {
       ativo = false;
     };

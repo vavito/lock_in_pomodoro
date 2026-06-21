@@ -167,3 +167,12 @@
 .dark [data-rich-colors="true"][data-sonner-toast][data-type="success"] {
   border-color: rgb(247 162 36 / 36%) !important;
 }
+
+.dark [data-rich-colors="true"][data-sonner-toast][data-type="success"] [data-icon] {
+  color: #22c55e !important;
+}
+
+.dark [data-rich-colors="true"][data-sonner-toast][data-type="success"] [data-icon] svg {
+  color: #22c55e !important;
+  stroke: #22c55e !important;
+}
