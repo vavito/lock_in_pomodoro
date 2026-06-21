@@ -5,6 +5,7 @@ dist
 !.env.example
 *.log
 coverage
+.vercel
 .DS_Store
 .vscode/
 Melhorias Lock In Pomodoro - v1.pdf
