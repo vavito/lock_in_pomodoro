@@ -4,4 +4,5 @@ export interface UsuarioRepository {
   buscarPorEmail(email: string): Promise<Usuario | null>
   buscarPorId(id: string): Promise<Usuario | null>
   salvar(usuario: Usuario): Promise<Usuario>
+  atualizar(usuario: Usuario): Promise<Usuario>
 }

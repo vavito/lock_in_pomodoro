@@ -206,6 +206,20 @@ export const authApi = {
     const resposta = await request<UsuarioResponse>("/usuarios/me");
     return resposta.usuario;
   },
+  atualizarPerfil: async (dados: { nome?: string; email?: string }) => {
+    const resposta = await request<UsuarioResponse>("/usuarios/me", {
+      method: "PATCH",
+      body: dados,
+    });
+    return resposta.usuario;
+  },
+  alterarSenha: async (senhaAtual: string, novaSenha: string) => {
+    const resposta = await request<UsuarioResponse>("/usuarios/me/senha", {
+      method: "PATCH",
+      body: { senhaAtual, novaSenha },
+    });
+    return resposta.usuario;
+  },
 };
 
 export const configuracoesApi = {

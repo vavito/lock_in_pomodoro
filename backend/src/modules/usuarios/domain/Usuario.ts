@@ -52,6 +52,18 @@ export class Usuario {
     this.props.atualizadoEm = new Date()
   }
 
+  atualizarEmail(email: string) {
+    this.props.email = email.trim().toLowerCase()
+    this.props.atualizadoEm = new Date()
+    this.validar()
+  }
+
+  atualizarSenhaHash(senhaHash: string) {
+    this.props.senhaHash = senhaHash
+    this.props.atualizadoEm = new Date()
+    this.validar()
+  }
+
   possuiEmail(email: string) {
     return this.props.email === email.trim().toLowerCase()
   }
