@@ -264,7 +264,7 @@ export function Timer() {
       </div>
 
       <div className="flex flex-col items-center">
-        <h1 className="font-mono-timer text-[6.5rem] font-extrabold leading-none tracking-tighter text-foreground sm:text-[10rem] md:text-[13rem]">
+        <h1 className="font-mono-timer text-[6.5rem] font-extrabold leading-none tracking-tighter text-foreground sm:text-[8.5rem] md:text-[10rem] xl:text-[11rem]">
           {formatarMMSS(segundosRestantes)}
         </h1>
         <div className="mt-6 flex items-center justify-center gap-4">

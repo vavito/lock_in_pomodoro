@@ -104,15 +104,15 @@ function PerfilPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-5xl">
         <h1 className="mb-1 text-2xl font-semibold">Perfil</h1>
         <p className="mb-8 text-sm text-muted-foreground">Atualize seus dados de acesso.</p>
 
-        <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
+        <div className="grid gap-6 lg:grid-cols-[1fr_1fr] lg:gap-8">
           <form
             onSubmit={salvarPerfil}
             noValidate
-            className="rounded-3xl border border-border bg-card p-6 sm:p-8"
+            className="rounded-3xl border border-border bg-card p-6 sm:p-8 lg:p-10"
           >
             <h2 className="mb-5 font-mono-timer text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
               Dados da conta
@@ -155,7 +155,7 @@ function PerfilPage() {
           <form
             onSubmit={salvarSenha}
             noValidate
-            className="rounded-3xl border border-border bg-card p-6 sm:p-8"
+            className="rounded-3xl border border-border bg-card p-6 sm:p-8 lg:p-10"
           >
             <h2 className="mb-5 font-mono-timer text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
               Alterar senha
