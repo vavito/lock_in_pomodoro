@@ -15,6 +15,8 @@ type AuthContextType = {
   logado: boolean;
   login: (email: string, senha: string) => Promise<void>;
   cadastro: (nome: string, email: string, senha: string) => Promise<void>;
+  atualizarPerfil: (dados: { nome?: string; email?: string }) => Promise<void>;
+  alterarSenha: (senhaAtual: string, novaSenha: string) => Promise<void>;
   logout: () => Promise<void>;
 };
 
@@ -71,6 +73,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const atualizarPerfil = async (dados: { nome?: string; email?: string }) => {
+    const usuarioAtualizado = await authApi.atualizarPerfil(dados);
+    setUsuario(usuarioAtualizado);
+  };
+
+  const alterarSenha = async (senhaAtual: string, novaSenha: string) => {
+    const usuarioAtualizado = await authApi.alterarSenha(senhaAtual, novaSenha);
+    setUsuario(usuarioAtualizado);
+  };
+
   const logout = async () => {
     const refresh = obterRefreshToken();
     if (refresh) {
@@ -92,6 +104,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logado: !!usuario,
         login,
         cadastro,
+        atualizarPerfil,
+        alterarSenha,
         logout,
       }}
     >

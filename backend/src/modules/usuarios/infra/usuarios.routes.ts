@@ -6,6 +6,8 @@ import { AuthController } from '../controller/auth.controller.js'
 import { UsuarioController } from '../controller/usuario.controller.js'
 import { PrismaTokenAtualizacaoRepository } from '../repository/prisma-token-atualizacao.repository.js'
 import { PrismaUsuarioRepository } from '../repository/prisma-usuario.repository.js'
+import { AlterarSenhaService } from '../service/alterar-senha.service.js'
+import { AtualizarUsuarioService } from '../service/atualizar-usuario.service.js'
 import { BuscarUsuarioLogadoService } from '../service/buscar-usuario-logado.service.js'
 import { CadastrarUsuarioService } from '../service/cadastrar-usuario.service.js'
 import { LoginUsuarioService } from '../service/login-usuario.service.js'
@@ -33,6 +35,11 @@ export async function usuariosRoutes(app: FastifyInstance) {
   const buscarUsuarioLogadoService = new BuscarUsuarioLogadoService(
     usuarioRepository,
   )
+  const atualizarUsuarioService = new AtualizarUsuarioService(usuarioRepository)
+  const alterarSenhaService = new AlterarSenhaService(
+    usuarioRepository,
+    senhaService,
+  )
   const gerarTokenAtualizacaoService = new GerarTokenAtualizacaoService(
     tokenAtualizacaoRepository,
   )
@@ -49,7 +56,11 @@ export async function usuariosRoutes(app: FastifyInstance) {
     renovarTokenService,
     logoutService,
   )
-  const usuarioController = new UsuarioController(buscarUsuarioLogadoService)
+  const usuarioController = new UsuarioController(
+    buscarUsuarioLogadoService,
+    atualizarUsuarioService,
+    alterarSenhaService,
+  )
 
   app.post('/auth/cadastro', authController.cadastrar.bind(authController))
   app.post('/auth/login', authController.login.bind(authController))
@@ -61,5 +72,19 @@ export async function usuariosRoutes(app: FastifyInstance) {
       preHandler: autenticar,
     },
     usuarioController.buscarLogado.bind(usuarioController),
+  )
+  app.patch(
+    '/usuarios/me',
+    {
+      preHandler: autenticar,
+    },
+    usuarioController.atualizar.bind(usuarioController),
+  )
+  app.patch(
+    '/usuarios/me/senha',
+    {
+      preHandler: autenticar,
+    },
+    usuarioController.alterarSenha.bind(usuarioController),
   )
 }

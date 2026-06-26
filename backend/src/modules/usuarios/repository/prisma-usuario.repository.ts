@@ -44,4 +44,21 @@ export class PrismaUsuarioRepository implements UsuarioRepository {
 
     return UsuarioMapper.paraDominio(usuarioCriado)
   }
+
+  async atualizar(usuario: Usuario) {
+    const dados = UsuarioMapper.paraPersistencia(usuario)
+
+    const usuarioAtualizado = await this.prisma.usuario.update({
+      where: {
+        id: dados.id,
+      },
+      data: {
+        nome: dados.nome,
+        email: dados.email,
+        senhaHash: dados.senhaHash,
+      },
+    })
+
+    return UsuarioMapper.paraDominio(usuarioAtualizado)
+  }
 }

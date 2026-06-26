@@ -29,6 +29,20 @@ class UsuarioRepositoryEmMemoria implements UsuarioRepository {
     this.usuarios.push(usuario)
     return usuario
   }
+
+  async atualizar(usuario: Usuario) {
+    const indice = this.usuarios.findIndex(
+      (usuarioSalvo) => usuarioSalvo.id === usuario.id,
+    )
+
+    if (indice >= 0) {
+      this.usuarios[indice] = usuario
+      return usuario
+    }
+
+    this.usuarios.push(usuario)
+    return usuario
+  }
 }
 
 class SenhaServiceFake implements SenhaService {
