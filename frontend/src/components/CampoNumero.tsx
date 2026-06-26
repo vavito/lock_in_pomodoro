@@ -45,7 +45,7 @@ export function CampoNumero({ rotulo, valor, min, max, erro, onChange }: Props) 
           value={valor}
           onChange={(e) => alterar(e.target.value)}
           aria-invalid={!!erro}
-          className="min-w-0 bg-transparent px-3 text-center text-sm font-medium text-foreground outline-none"
+          className="min-w-0 bg-transparent px-3 text-center text-base font-medium text-foreground outline-none sm:text-sm"
         />
         <button
           type="button"
