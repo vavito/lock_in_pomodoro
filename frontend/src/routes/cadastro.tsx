@@ -92,7 +92,7 @@ function CadastroPage() {
       <form
         onSubmit={enviar}
         noValidate
-        className="w-full max-w-sm rounded-3xl border border-border bg-card p-8 shadow-2xl"
+        className="w-full max-w-sm rounded-3xl border border-border bg-card p-8 shadow-2xl sm:max-w-md lg:max-w-lg lg:p-10"
       >
         <div className="mb-8 flex items-center gap-2">
           <div className="size-2 rounded-full bg-primary shadow-[0_0_10px_var(--color-primary)]" />

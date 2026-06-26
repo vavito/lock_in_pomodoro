@@ -3,6 +3,8 @@ import {
   BarChart3,
   LogOut,
   Moon,
+  PanelLeftClose,
+  PanelLeftOpen,
   Settings,
   Sun,
   Timer,
@@ -52,10 +54,22 @@ function ToggleTema() {
 export function AppShell({ children }: { children: ReactNode }) {
   const { usuario, logout } = useAuth();
   const router = useRouter();
+  const [sidebarAberta, setSidebarAberta] = useState(true);
+
+  useEffect(() => {
+    const valorSalvo = localStorage.getItem("lockin.sidebarAberta");
+    if (valorSalvo) setSidebarAberta(valorSalvo === "true");
+  }, []);
 
   const sair = async () => {
     await logout();
     router.navigate({ to: "/login" });
+  };
+
+  const alternarSidebar = () => {
+    const novoValor = !sidebarAberta;
+    setSidebarAberta(novoValor);
+    localStorage.setItem("lockin.sidebarAberta", String(novoValor));
   };
 
   return (
@@ -69,37 +83,58 @@ export function AppShell({ children }: { children: ReactNode }) {
       />
 
       <div className="relative z-10 flex min-h-screen">
-        <aside className="hidden w-64 shrink-0 border-r border-border bg-background/80 px-4 py-5 backdrop-blur lg:flex lg:flex-col">
-          <Link to="/" className="mb-8 flex items-center gap-2 px-2">
-            <div className="size-2 rounded-full bg-primary shadow-[0_0_10px_var(--color-primary)]" />
-            <span className="text-sm font-semibold tracking-tight">
-              LOCK IN <span className="text-muted-foreground">Pomodoro</span>
-            </span>
-          </Link>
-
-          <nav className="flex flex-1 flex-col gap-1">
-            {ITENS_NAVEGACAO.map((item) => (
-              <NavLink key={item.to} {...item} />
-            ))}
-          </nav>
-
-          <div className="space-y-3 border-t border-border pt-4">
-            <div className="flex items-center gap-2 px-2 text-xs text-muted-foreground">
-              <UserCircle className="size-4" />
-              <span className="truncate">{usuario?.nome ?? usuario?.email}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <ToggleTema />
+        {sidebarAberta ? (
+          <aside className="hidden w-64 shrink-0 border-r border-border bg-background/80 px-4 py-5 backdrop-blur lg:flex lg:flex-col">
+            <div className="mb-8 flex items-center justify-between gap-3 px-2">
+              <Link to="/" className="flex min-w-0 items-center gap-2">
+                <div className="size-2 shrink-0 rounded-full bg-primary shadow-[0_0_10px_var(--color-primary)]" />
+                <span className="truncate text-sm font-semibold tracking-tight">
+                  LOCK IN <span className="text-muted-foreground">Pomodoro</span>
+                </span>
+              </Link>
               <button
-                onClick={sair}
-                className="flex h-9 flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border border-border bg-card px-3 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+                onClick={alternarSidebar}
+                className="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-colors hover:text-foreground"
+                title="Fechar sidebar"
+                aria-label="Fechar sidebar"
               >
-                <LogOut className="size-4" />
-                Sair
+                <PanelLeftClose className="size-4" />
               </button>
             </div>
-          </div>
-        </aside>
+
+            <nav className="flex flex-1 flex-col gap-1">
+              {ITENS_NAVEGACAO.map((item) => (
+                <NavLink key={item.to} {...item} />
+              ))}
+            </nav>
+
+            <div className="space-y-3 border-t border-border pt-4">
+              <div className="flex items-center gap-2 px-2 text-xs text-muted-foreground">
+                <UserCircle className="size-4" />
+                <span className="truncate">{usuario?.nome ?? usuario?.email}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <ToggleTema />
+                <button
+                  onClick={sair}
+                  className="flex h-9 flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border border-border bg-card px-3 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <LogOut className="size-4" />
+                  Sair
+                </button>
+              </div>
+            </div>
+          </aside>
+        ) : (
+          <button
+            onClick={alternarSidebar}
+            className="fixed left-5 top-5 z-30 hidden size-10 cursor-pointer items-center justify-center rounded-lg border border-border bg-card text-muted-foreground shadow-lg transition-colors hover:text-foreground lg:flex"
+            title="Abrir sidebar"
+            aria-label="Abrir sidebar"
+          >
+            <PanelLeftOpen className="size-4" />
+          </button>
+        )}
 
         <div className="flex min-w-0 flex-1 flex-col pb-20 lg:pb-0">
           <header className="border-b border-border lg:hidden">
