@@ -93,7 +93,7 @@ function EstatisticasPage() {
             type="date"
             value={data}
             onChange={(e) => setData(e.target.value)}
-            className="rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary"
+            className="rounded-lg border border-border bg-card px-3 py-2 text-base text-foreground outline-none focus:ring-2 focus:ring-primary sm:text-sm"
           />
         </div>
 

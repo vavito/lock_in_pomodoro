@@ -68,11 +68,11 @@ function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-6">
+    <div className="flex min-h-dvh items-center justify-center bg-background px-5 py-8">
       <form
         onSubmit={enviar}
         noValidate
-        className="w-full max-w-sm rounded-3xl border border-border bg-card p-8 shadow-2xl"
+        className="w-full max-w-md rounded-3xl border border-border bg-card p-7 shadow-2xl sm:p-8"
       >
         <div className="mb-8 flex items-center gap-2">
           <div className="size-2 rounded-full bg-primary shadow-[0_0_10px_var(--color-primary)]" />
@@ -96,7 +96,7 @@ function LoginPage() {
               aria-invalid={!!errosCampos.email}
               aria-describedby={errosCampos.email ? "login-email-erro" : undefined}
               className={
-                "rounded-lg border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 " +
+                "rounded-lg border bg-background px-3 py-2.5 text-base text-foreground outline-none focus:ring-2 sm:text-sm " +
                 (errosCampos.email
                   ? "border-destructive focus:ring-destructive"
                   : "border-border focus:ring-primary")
@@ -122,7 +122,7 @@ function LoginPage() {
                 aria-invalid={!!errosCampos.senha}
                 aria-describedby={errosCampos.senha ? "login-senha-erro" : undefined}
                 className={
-                  "w-full rounded-lg border bg-background px-3 py-2.5 pr-11 text-sm text-foreground outline-none focus:ring-2 " +
+                  "w-full rounded-lg border bg-background px-3 py-2.5 pr-11 text-base text-foreground outline-none focus:ring-2 sm:text-sm " +
                   (errosCampos.senha
                     ? "border-destructive focus:ring-destructive"
                     : "border-border focus:ring-primary")
