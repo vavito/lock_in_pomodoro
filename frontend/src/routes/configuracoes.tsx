@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { CampoNumero } from "@/components/CampoNumero";
+import { CarregandoPagina } from "@/components/CarregandoPagina";
 import { useAuth } from "@/contexts/AuthContext";
 import { configuracoesApi } from "@/services/api";
 import type { Configuracao } from "@/types";
@@ -53,11 +54,7 @@ function ConfiguracoesPage() {
   }, [logado]);
 
   if (carregando || !logado) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">
-        Carregando...
-      </div>
-    );
+    return <CarregandoPagina />;
   }
 
   const atualizarCampo = <K extends keyof Configuracao>(chave: K, valor: Configuracao[K]) => {
@@ -164,9 +161,16 @@ function ConfiguracoesPage() {
         </p>
 
         {carregandoConfig || !config || !camposNumericos ? (
-          <p className="text-sm text-muted-foreground">Carregando configurações...</p>
+          <div className="animate-pulse rounded-3xl border border-border bg-card p-6 sm:p-8">
+            <div className="mb-6 h-4 w-48 rounded-full bg-secondary" />
+            <div className="grid gap-5 sm:grid-cols-2">
+              {Array.from({ length: 4 }).map((_, indice) => (
+                <div key={indice} className="h-16 rounded-xl bg-secondary/70" />
+              ))}
+            </div>
+          </div>
         ) : (
-          <div className="rounded-3xl border border-border bg-card p-6 sm:p-8">
+          <div className="animate-page-enter rounded-3xl border border-border bg-card p-6 transition-all duration-200 hover:shadow-lg sm:p-8">
             <div className="grid gap-5 sm:grid-cols-2">
               <CampoNumero
                 rotulo="Pomodoro (min)"
@@ -223,14 +227,14 @@ function ConfiguracoesPage() {
                 <button
                   onClick={salvar}
                   disabled={salvando}
-                  className="cursor-pointer rounded-2xl bg-primary px-6 py-2.5 text-sm font-bold tracking-widest text-primary-foreground transition-all hover:opacity-90 disabled:opacity-50"
+                  className="cursor-pointer rounded-2xl bg-primary px-6 py-2.5 text-sm font-bold tracking-widest text-primary-foreground transition-all duration-200 hover:-translate-y-0.5 hover:opacity-90 hover:shadow-md active:translate-y-0 disabled:opacity-50"
                 >
                   {salvando ? "SALVANDO..." : "SALVAR"}
                 </button>
                 <button
                   onClick={cancelarAlteracoes}
                   disabled={salvando}
-                  className="cursor-pointer rounded-2xl border border-border bg-white px-6 py-2.5 text-sm font-bold tracking-widest text-black transition-all hover:bg-white/90 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-white/90"
+                  className="cursor-pointer rounded-2xl border border-border bg-white px-6 py-2.5 text-sm font-bold tracking-widest text-black transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-md active:translate-y-0 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-white/90"
                 >
                   CANCELAR
                 </button>

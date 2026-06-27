@@ -4,6 +4,7 @@ import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
+import { CarregandoPagina } from "@/components/CarregandoPagina";
 import { useAuth } from "@/contexts/AuthContext";
 import { emailValido, senhaValida } from "@/lib/validacoes-auth";
 
@@ -39,11 +40,7 @@ function PerfilPage() {
   }, [usuario]);
 
   if (carregando || !logado || !usuario) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">
-        Carregando...
-      </div>
-    );
+    return <CarregandoPagina />;
   }
 
   const salvarPerfil = async (e: FormEvent) => {
@@ -112,7 +109,7 @@ function PerfilPage() {
           <form
             onSubmit={salvarPerfil}
             noValidate
-            className="rounded-3xl border border-border bg-card p-6 sm:p-8 lg:p-10"
+            className="rounded-3xl border border-border bg-card p-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg sm:p-8 lg:p-10"
           >
             <h2 className="mb-5 font-mono-timer text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
               Dados da conta
@@ -145,7 +142,7 @@ function PerfilPage() {
             <button
               type="submit"
               disabled={salvandoPerfil}
-              className="mt-6 flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 text-sm font-bold tracking-widest text-primary-foreground transition-all hover:opacity-90 disabled:opacity-50"
+              className="mt-6 flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 text-sm font-bold tracking-widest text-primary-foreground transition-all duration-200 hover:-translate-y-0.5 hover:opacity-90 hover:shadow-md active:translate-y-0 disabled:opacity-50"
             >
               <Save className="size-4" />
               {salvandoPerfil ? "SALVANDO..." : "SALVAR"}
@@ -155,7 +152,7 @@ function PerfilPage() {
           <form
             onSubmit={salvarSenha}
             noValidate
-            className="rounded-3xl border border-border bg-card p-6 sm:p-8 lg:p-10"
+            className="rounded-3xl border border-border bg-card p-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg sm:p-8 lg:p-10"
           >
             <h2 className="mb-5 font-mono-timer text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
               Alterar senha
@@ -183,7 +180,7 @@ function PerfilPage() {
             <button
               type="submit"
               disabled={salvandoSenha}
-              className="mt-6 flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 text-sm font-bold tracking-widest text-primary-foreground transition-all hover:opacity-90 disabled:opacity-50"
+              className="mt-6 flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 text-sm font-bold tracking-widest text-primary-foreground transition-all duration-200 hover:-translate-y-0.5 hover:opacity-90 hover:shadow-md active:translate-y-0 disabled:opacity-50"
             >
               <Save className="size-4" />
               {salvandoSenha ? "SALVANDO..." : "ALTERAR SENHA"}

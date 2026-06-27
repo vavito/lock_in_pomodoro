@@ -42,7 +42,7 @@ function ToggleTema() {
   return (
     <button
       onClick={alternar}
-      className="flex size-9 cursor-pointer items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-colors hover:text-foreground"
+      className="flex size-9 cursor-pointer items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:text-foreground hover:shadow-md active:translate-y-0"
       title={escuro ? "Ativar modo claro" : "Ativar modo escuro"}
       aria-label={escuro ? "Ativar modo claro" : "Ativar modo escuro"}
     >
@@ -83,8 +83,14 @@ export function AppShell({ children }: { children: ReactNode }) {
       />
 
       <div className="relative z-10 flex min-h-screen">
-        {sidebarAberta ? (
-          <aside className="hidden w-64 shrink-0 border-r border-border bg-background/80 px-4 py-5 backdrop-blur lg:flex lg:flex-col">
+        <aside
+          className={`hidden shrink-0 overflow-hidden border-r bg-background/80 py-5 backdrop-blur transition-[width,padding,opacity,border-color] duration-300 ease-out lg:flex lg:flex-col ${
+            sidebarAberta
+              ? "w-64 border-border px-4 opacity-100"
+              : "w-0 border-transparent px-0 opacity-0"
+          }`}
+        >
+          <div className="flex h-full w-56 min-w-56 flex-col">
             <div className="mb-8 flex items-center justify-between gap-3 px-2">
               <Link to="/" className="flex min-w-0 items-center gap-2">
                 <div className="size-2 shrink-0 rounded-full bg-primary shadow-[0_0_10px_var(--color-primary)]" />
@@ -94,7 +100,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               </Link>
               <button
                 onClick={alternarSidebar}
-                className="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-colors hover:text-foreground"
+                className="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:text-foreground hover:shadow-md active:translate-y-0"
                 title="Fechar sidebar"
                 aria-label="Fechar sidebar"
               >
@@ -117,18 +123,20 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <ToggleTema />
                 <button
                   onClick={sair}
-                  className="flex h-9 flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border border-border bg-card px-3 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+                  className="flex h-9 flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border border-border bg-card px-3 text-xs font-medium text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:border-red-400/50 hover:bg-red-500/10 hover:text-red-400 hover:shadow-md active:translate-y-0"
                 >
                   <LogOut className="size-4" />
                   Sair
                 </button>
               </div>
             </div>
-          </aside>
-        ) : (
+          </div>
+        </aside>
+
+        {!sidebarAberta && (
           <button
             onClick={alternarSidebar}
-            className="fixed left-5 top-5 z-30 hidden size-10 cursor-pointer items-center justify-center rounded-lg border border-border bg-card text-muted-foreground shadow-lg transition-colors hover:text-foreground lg:flex"
+            className="animate-soft-pop fixed left-5 top-5 z-30 hidden size-10 cursor-pointer items-center justify-center rounded-lg border border-border bg-card text-muted-foreground shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:text-foreground hover:shadow-xl active:translate-y-0 lg:flex"
             title="Abrir sidebar"
             aria-label="Abrir sidebar"
           >
@@ -150,7 +158,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <ToggleTema />
                 <button
                   onClick={sair}
-                  className="flex size-9 cursor-pointer items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-colors hover:text-foreground"
+                  className="flex size-9 cursor-pointer items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:border-red-400/50 hover:bg-red-500/10 hover:text-red-400 hover:shadow-md active:translate-y-0"
                   title="Sair"
                   aria-label="Sair"
                 >
@@ -160,7 +168,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             </div>
           </header>
 
-          <main className="mx-auto w-full max-w-5xl px-5 py-8 sm:px-6 sm:py-12">{children}</main>
+          <main className="animate-page-enter mx-auto w-full max-w-5xl px-5 py-8 sm:px-6 sm:py-12">
+            {children}
+          </main>
         </div>
 
         <nav className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-4 border-t border-border bg-background/95 px-2 py-2 backdrop-blur lg:hidden">
@@ -178,7 +188,7 @@ function NavLink({ to, rotulo, Icone }: { to: string; rotulo: string; Icone: Luc
     <Link
       to={to}
       activeOptions={{ exact: to === "/" }}
-      className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary/70 hover:text-foreground data-[status=active]:bg-secondary data-[status=active]:text-foreground"
+      className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-all duration-200 hover:translate-x-1 hover:bg-secondary/70 hover:text-foreground data-[status=active]:bg-secondary data-[status=active]:text-foreground"
     >
       <Icone className="size-4" />
       {rotulo}
@@ -191,7 +201,7 @@ function MobileNavLink({ to, rotulo, Icone }: { to: string; rotulo: string; Icon
     <Link
       to={to}
       activeOptions={{ exact: to === "/" }}
-      className="flex min-h-12 flex-col items-center justify-center gap-1 rounded-lg text-[11px] font-medium text-muted-foreground transition-colors hover:text-foreground data-[status=active]:bg-secondary data-[status=active]:text-foreground"
+      className="flex min-h-12 flex-col items-center justify-center gap-1 rounded-lg text-[11px] font-medium text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:text-foreground data-[status=active]:bg-secondary data-[status=active]:text-foreground"
     >
       <Icone className="size-4" />
       <span>{rotulo}</span>
