@@ -4,6 +4,7 @@ import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
+import { BotaoFormulario } from "@/components/BotaoFormulario";
 import { CarregandoPagina } from "@/components/CarregandoPagina";
 import { useAuth } from "@/contexts/AuthContext";
 import { emailValido, senhaValida } from "@/lib/validacoes-auth";
@@ -139,14 +140,15 @@ function PerfilPage() {
 
             {erroPerfil && <p className="mt-4 text-sm text-destructive">{erroPerfil}</p>}
 
-            <button
+            <BotaoFormulario
               type="submit"
-              disabled={salvandoPerfil}
-              className="mt-6 flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 text-sm font-bold tracking-widest text-primary-foreground transition-all duration-200 hover:-translate-y-0.5 hover:opacity-90 hover:shadow-md active:translate-y-0 disabled:opacity-50"
+              carregando={salvandoPerfil}
+              textoCarregando="SALVANDO..."
+              className="mt-6 w-full"
             >
               <Save className="size-4" />
-              {salvandoPerfil ? "SALVANDO..." : "SALVAR"}
-            </button>
+              <span>SALVAR</span>
+            </BotaoFormulario>
           </form>
 
           <form
@@ -177,14 +179,15 @@ function PerfilPage() {
 
             {erroSenha && <p className="mt-4 text-sm text-destructive">{erroSenha}</p>}
 
-            <button
+            <BotaoFormulario
               type="submit"
-              disabled={salvandoSenha}
-              className="mt-6 flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 text-sm font-bold tracking-widest text-primary-foreground transition-all duration-200 hover:-translate-y-0.5 hover:opacity-90 hover:shadow-md active:translate-y-0 disabled:opacity-50"
+              carregando={salvandoSenha}
+              textoCarregando="SALVANDO..."
+              className="mt-6 w-full"
             >
               <Save className="size-4" />
-              {salvandoSenha ? "SALVANDO..." : "ALTERAR SENHA"}
-            </button>
+              <span>ALTERAR SENHA</span>
+            </BotaoFormulario>
           </form>
         </div>
       </div>

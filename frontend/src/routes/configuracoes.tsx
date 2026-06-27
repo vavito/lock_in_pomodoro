@@ -2,6 +2,7 @@ import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
+import { BotaoFormulario } from "@/components/BotaoFormulario";
 import { CampoNumero } from "@/components/CampoNumero";
 import { CarregandoPagina } from "@/components/CarregandoPagina";
 import { useAuth } from "@/contexts/AuthContext";
@@ -224,13 +225,14 @@ function ConfiguracoesPage() {
                 {erro ? erro : "Tempos: 1 a 59 min. Pomodoros: 1 a 99."}
               </p>
               <div className="flex items-center gap-2">
-                <button
+                <BotaoFormulario
                   onClick={salvar}
-                  disabled={salvando}
-                  className="cursor-pointer rounded-2xl bg-primary px-6 py-2.5 text-sm font-bold tracking-widest text-primary-foreground transition-all duration-200 hover:-translate-y-0.5 hover:opacity-90 hover:shadow-md active:translate-y-0 disabled:opacity-50"
+                  carregando={salvando}
+                  textoCarregando="SALVANDO..."
+                  className="py-2.5"
                 >
-                  {salvando ? "SALVANDO..." : "SALVAR"}
-                </button>
+                  SALVAR
+                </BotaoFormulario>
                 <button
                   onClick={cancelarAlteracoes}
                   disabled={salvando}

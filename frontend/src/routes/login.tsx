@@ -1,6 +1,7 @@
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { Eye, EyeOff } from "lucide-react";
 import { useEffect, useState } from "react";
+import { BotaoFormulario } from "@/components/BotaoFormulario";
 import { useAuth } from "@/contexts/AuthContext";
 import { emailValido, senhaValida, validarCamposAuth, type ErrosAuth } from "@/lib/validacoes-auth";
 
@@ -19,6 +20,7 @@ function LoginPage() {
   const [erro, setErro] = useState<string | null>(null);
   const [errosCampos, setErrosCampos] = useState<ErrosAuth>({});
   const [senhaVisivel, setSenhaVisivel] = useState(false);
+  const [saindo, setSaindo] = useState(false);
 
   useEffect(() => {
     if (logado) router.navigate({ to: "/" });
@@ -68,12 +70,20 @@ function LoginPage() {
     }
   };
 
+  const irParaCadastro = () => {
+    setSaindo(true);
+    window.setTimeout(() => router.navigate({ to: "/cadastro" }), 180);
+  };
+
   return (
     <div className="flex min-h-dvh items-center justify-center bg-background px-5 py-8">
       <form
         onSubmit={enviar}
         noValidate
-        className="w-full max-w-md rounded-3xl border border-border bg-card p-7 shadow-2xl sm:p-8 lg:max-w-lg lg:p-10"
+        className={
+          "w-full max-w-md rounded-3xl border border-border bg-card p-7 shadow-2xl sm:p-8 lg:max-w-lg lg:p-10 " +
+          (saindo ? "animate-auth-card-expand-out pointer-events-none" : "animate-auth-card-in")
+        }
       >
         <div className="mb-8 flex items-center gap-2">
           <div className="size-2 rounded-full bg-primary shadow-[0_0_10px_var(--color-primary)]" />
@@ -149,19 +159,24 @@ function LoginPage() {
 
         {erro && <p className="mt-4 text-sm text-destructive">{erro}</p>}
 
-        <button
+        <BotaoFormulario
           type="submit"
-          disabled={carregando}
-          className="mt-6 w-full cursor-pointer rounded-2xl bg-primary px-6 py-3 text-sm font-bold tracking-widest text-primary-foreground transition-all duration-200 hover:-translate-y-0.5 hover:opacity-90 hover:shadow-md active:translate-y-0 disabled:opacity-50"
+          carregando={carregando}
+          textoCarregando="ENTRANDO..."
+          className="mt-6 w-full"
         >
-          {carregando ? "ENTRANDO..." : "ENTRAR"}
-        </button>
+          ENTRAR
+        </BotaoFormulario>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
           Sem conta?{" "}
-          <Link to="/cadastro" className="text-primary hover:underline">
+          <button
+            type="button"
+            onClick={irParaCadastro}
+            className="cursor-pointer text-primary transition-colors hover:underline"
+          >
             Cadastre-se
-          </Link>
+          </button>
         </p>
       </form>
     </div>
