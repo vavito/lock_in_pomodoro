@@ -1,6 +1,7 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
+import { CalendarioData } from "@/components/CalendarioData";
 import { CarregandoPagina } from "@/components/CarregandoPagina";
 import { useAuth } from "@/contexts/AuthContext";
 import { estatisticasApi } from "@/services/api";
@@ -86,12 +87,7 @@ function EstatisticasPage() {
             ))}
           </div>
 
-          <input
-            type="date"
-            value={data}
-            onChange={(e) => setData(e.target.value)}
-            className="rounded-lg border border-border bg-card px-3 py-2 text-base text-foreground outline-none transition-all duration-200 focus:ring-2 focus:ring-primary sm:text-sm"
-          />
+          <CalendarioData valor={data} onChange={setData} />
         </div>
 
         {carregandoStats && (
