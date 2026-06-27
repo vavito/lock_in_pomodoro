@@ -11,7 +11,7 @@ import {
   UserCircle,
   type LucideIcon,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import type { PointerEvent, ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -55,6 +55,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { usuario, logout } = useAuth();
   const router = useRouter();
   const [sidebarAberta, setSidebarAberta] = useState(false);
+  const [focoFundo, setFocoFundo] = useState({ x: 0, y: 0, ativo: false });
 
   useEffect(() => {
     const valorSalvo = localStorage.getItem("lockin.sidebarAberta");
@@ -72,13 +73,32 @@ export function AppShell({ children }: { children: ReactNode }) {
     localStorage.setItem("lockin.sidebarAberta", String(novoValor));
   };
 
+  const atualizarFocoFundo = (evento: PointerEvent<HTMLDivElement>) => {
+    if (evento.pointerType === "touch") return;
+    setFocoFundo({ x: evento.clientX, y: evento.clientY, ativo: true });
+  };
+
   return (
-    <div className="relative min-h-screen bg-background text-foreground">
+    <div
+      className="relative min-h-screen bg-background text-foreground"
+      onPointerMove={atualizarFocoFundo}
+      onPointerLeave={() => setFocoFundo((foco) => ({ ...foco, ativo: false }))}
+    >
       <div
-        className="pointer-events-none fixed inset-0 hidden opacity-[0.04] dark:block"
+        className="animate-dots-drift pointer-events-none fixed inset-0 hidden opacity-[0.04] dark:block"
         style={{
           backgroundImage: "radial-gradient(#fff 1px, transparent 0)",
           backgroundSize: "24px 24px",
+        }}
+      />
+      <div
+        className="pointer-events-none fixed inset-0 hidden transition-opacity duration-200 dark:block"
+        style={{
+          backgroundImage: "radial-gradient(#fff 1px, transparent 0)",
+          backgroundSize: "24px 24px",
+          opacity: focoFundo.ativo ? 0.18 : 0,
+          WebkitMaskImage: `radial-gradient(170px circle at ${focoFundo.x}px ${focoFundo.y}px, black 0%, transparent 72%)`,
+          maskImage: `radial-gradient(170px circle at ${focoFundo.x}px ${focoFundo.y}px, black 0%, transparent 72%)`,
         }}
       />
 

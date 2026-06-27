@@ -221,6 +221,16 @@
   }
 }
 
+@keyframes dots-drift {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 24px 24px;
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .animate-page-enter {
     animation: page-enter 260ms ease-out both;
@@ -244,6 +254,10 @@
 
   .animate-auth-card-shrink-out {
     animation: auth-card-shrink-out 180ms ease-in both;
+  }
+
+  .animate-dots-drift {
+    animation: dots-drift 18s linear infinite;
   }
 
   .loading-dot {
