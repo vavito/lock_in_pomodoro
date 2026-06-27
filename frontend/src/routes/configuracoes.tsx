@@ -143,6 +143,9 @@ function ConfiguracoesPage() {
       setConfig(atualizado);
       setConfigSalva(atualizado);
       setCamposNumericos(camposNumericosDaConfig(atualizado));
+      window.dispatchEvent(
+        new CustomEvent<Configuracao>("lockin.configuracaoAtualizada", { detail: atualizado }),
+      );
       toast.success("Configurações salvas com sucesso.");
     } catch (e) {
       const mensagem = (e as Error).message;

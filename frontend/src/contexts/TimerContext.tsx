@@ -174,6 +174,18 @@ export function TimerProvider({ children }: { children: ReactNode }) {
   }, [tipo, config, rodando, timerCongelado]);
 
   useEffect(() => {
+    const atualizarConfiguracao = (evento: Event) => {
+      setConfig((evento as CustomEvent<Configuracao>).detail);
+    };
+
+    window.addEventListener("lockin.configuracaoAtualizada", atualizarConfiguracao);
+
+    return () => {
+      window.removeEventListener("lockin.configuracaoAtualizada", atualizarConfiguracao);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!logado) return;
     if ("Notification" in window && Notification.permission === "default") {
       Notification.requestPermission().catch((erro) => {
