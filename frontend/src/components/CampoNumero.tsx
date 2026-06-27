@@ -25,7 +25,7 @@ export function CampoNumero({ rotulo, valor, min, max, erro, onChange }: Props) 
       <span className="text-xs font-medium text-muted-foreground">{rotulo}</span>
       <div
         className={
-          "grid h-11 grid-cols-[2.75rem_1fr_2.75rem] overflow-hidden rounded-lg border bg-background transition-shadow focus-within:ring-2 " +
+          "grid h-11 grid-cols-[2.75rem_1fr_2.75rem] overflow-hidden rounded-lg border bg-background transition-all duration-200 focus-within:ring-2 hover:shadow-md " +
           (erro
             ? "border-destructive focus-within:ring-destructive"
             : "border-border focus-within:ring-primary")
@@ -34,7 +34,7 @@ export function CampoNumero({ rotulo, valor, min, max, erro, onChange }: Props) 
         <button
           type="button"
           onClick={() => somar(-1)}
-          className="flex cursor-pointer items-center justify-center border-r border-border text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          className="flex cursor-pointer items-center justify-center border-r border-border text-muted-foreground transition-all duration-200 hover:bg-secondary hover:text-foreground active:scale-95"
           aria-label={`Diminuir ${rotulo}`}
         >
           <Minus className="size-4" />
@@ -50,7 +50,7 @@ export function CampoNumero({ rotulo, valor, min, max, erro, onChange }: Props) 
         <button
           type="button"
           onClick={() => somar(1)}
-          className="flex cursor-pointer items-center justify-center border-l border-border text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          className="flex cursor-pointer items-center justify-center border-l border-border text-muted-foreground transition-all duration-200 hover:bg-secondary hover:text-foreground active:scale-95"
           aria-label={`Aumentar ${rotulo}`}
         >
           <Plus className="size-4" />

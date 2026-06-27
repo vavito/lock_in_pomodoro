@@ -1,6 +1,7 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
+import { CarregandoPagina } from "@/components/CarregandoPagina";
 import { useAuth } from "@/contexts/AuthContext";
 import { estatisticasApi } from "@/services/api";
 import { formatarTempoMinutos, hojeYYYYMMDD } from "@/lib/data";
@@ -58,11 +59,7 @@ function EstatisticasPage() {
   }, [logado, periodo, data]);
 
   if (carregando || !logado) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">
-        Carregando...
-      </div>
-    );
+    return <CarregandoPagina />;
   }
 
   return (
@@ -78,7 +75,7 @@ function EstatisticasPage() {
                 key={p.valor}
                 onClick={() => setPeriodo(p.valor)}
                 className={
-                  "cursor-pointer rounded-xl px-4 py-2 text-sm font-medium transition-colors " +
+                  "cursor-pointer rounded-xl px-4 py-2 text-sm font-medium transition-all duration-200 hover:-translate-y-0.5 " +
                   (periodo === p.valor
                     ? "bg-secondary text-foreground"
                     : "text-muted-foreground hover:text-foreground")
@@ -93,15 +90,27 @@ function EstatisticasPage() {
             type="date"
             value={data}
             onChange={(e) => setData(e.target.value)}
-            className="rounded-lg border border-border bg-card px-3 py-2 text-base text-foreground outline-none focus:ring-2 focus:ring-primary sm:text-sm"
+            className="rounded-lg border border-border bg-card px-3 py-2 text-base text-foreground outline-none transition-all duration-200 focus:ring-2 focus:ring-primary sm:text-sm"
           />
         </div>
 
-        {carregandoStats && <p className="text-sm text-muted-foreground">Carregando...</p>}
+        {carregandoStats && (
+          <div className="grid gap-3 sm:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, indice) => (
+              <div
+                key={indice}
+                className="h-28 animate-pulse rounded-2xl border border-border bg-card p-5"
+              >
+                <div className="mb-4 h-3 w-24 rounded-full bg-secondary" />
+                <div className="h-8 w-20 rounded-full bg-secondary/80" />
+              </div>
+            ))}
+          </div>
+        )}
         {erro && <p className="text-sm text-destructive">{erro}</p>}
 
         {stats && !carregandoStats && (
-          <>
+          <div className="animate-page-enter">
             <div className="grid gap-3 sm:grid-cols-3">
               <Card rotulo="Pomodoros" valor={String(stats.pomodorosRealizados)} destaque />
               <Card rotulo="Descansos Curtos" valor={String(stats.descansosCurtosRealizados)} />
@@ -117,7 +126,7 @@ function EstatisticasPage() {
               <Card rotulo="Dias Usados" valor={String(stats.diasUsados)} />
             </div>
 
-            <div className="mt-8 rounded-3xl border border-border bg-card p-6">
+            <div className="mt-8 rounded-3xl border border-border bg-card p-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
               <h2 className="mb-4 font-mono-timer text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
                 Dias no período
               </h2>
@@ -145,7 +154,7 @@ function EstatisticasPage() {
                 </ul>
               )}
             </div>
-          </>
+          </div>
         )}
       </div>
     </AppShell>
@@ -154,7 +163,7 @@ function EstatisticasPage() {
 
 function Card({ rotulo, valor, destaque }: { rotulo: string; valor: string; destaque?: boolean }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-5">
+    <div className="rounded-2xl border border-border bg-card p-5 transition-all duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg">
       <p className="font-mono-timer text-[10px] uppercase tracking-widest text-muted-foreground">
         {rotulo}
       </p>

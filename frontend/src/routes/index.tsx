@@ -1,6 +1,7 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { AppShell } from "@/components/AppShell";
+import { CarregandoPagina } from "@/components/CarregandoPagina";
 import { Timer } from "@/components/Timer";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -29,11 +30,7 @@ function Index() {
   }, [carregando, logado, router]);
 
   if (carregando || !logado) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">
-        Carregando...
-      </div>
-    );
+    return <CarregandoPagina />;
   }
 
   return (

@@ -126,14 +126,14 @@ export function ResumoDoDia({ resumo, aoAtualizar }: Props) {
             setEditando(true);
           }}
           disabled={editando}
-          className="w-16 self-start rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground disabled:cursor-default disabled:opacity-40 disabled:hover:text-muted-foreground sm:self-auto"
+          className="w-16 self-start rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:text-foreground hover:shadow-md active:translate-y-0 disabled:cursor-default disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:text-muted-foreground disabled:hover:shadow-none sm:self-auto"
         >
           Editar
         </button>
       </div>
 
       {editando && (
-        <div className="mt-6 rounded-2xl border border-border bg-card p-6">
+        <div className="animate-page-enter mt-6 rounded-2xl border border-border bg-card p-6">
           <div className="grid gap-4 sm:grid-cols-3">
             <CampoNumero
               rotulo="Pomodoros"
@@ -166,14 +166,14 @@ export function ResumoDoDia({ resumo, aoAtualizar }: Props) {
               <button
                 onClick={salvar}
                 disabled={salvando}
-                className="cursor-pointer rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90 disabled:opacity-50"
+                className="cursor-pointer rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:-translate-y-0.5 hover:opacity-90 hover:shadow-md active:translate-y-0 disabled:opacity-50"
               >
                 {salvando ? "Salvando..." : "Salvar"}
               </button>
               <button
                 onClick={cancelarEdicao}
                 disabled={salvando}
-                className="cursor-pointer rounded-lg border border-border bg-white px-4 py-2 text-sm font-semibold text-black transition-all hover:bg-white/90 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-white/90"
+                className="cursor-pointer rounded-lg border border-border bg-white px-4 py-2 text-sm font-semibold text-black transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-md active:translate-y-0 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-white/90"
               >
                 Cancelar
               </button>
@@ -195,7 +195,7 @@ function Metrica({
   destaque?: boolean;
 }) {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col transition-transform duration-200 hover:-translate-y-0.5">
       <span
         className={"font-mono-timer text-2xl " + (destaque ? "text-primary" : "text-foreground")}
       >

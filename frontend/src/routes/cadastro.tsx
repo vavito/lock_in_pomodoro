@@ -192,7 +192,7 @@ function CadastroPage() {
         <button
           type="submit"
           disabled={carregando}
-          className="mt-6 w-full cursor-pointer rounded-2xl bg-primary px-6 py-3 text-sm font-bold tracking-widest text-primary-foreground transition-all hover:opacity-90 disabled:opacity-50"
+          className="mt-6 w-full cursor-pointer rounded-2xl bg-primary px-6 py-3 text-sm font-bold tracking-widest text-primary-foreground transition-all duration-200 hover:-translate-y-0.5 hover:opacity-90 hover:shadow-md active:translate-y-0 disabled:opacity-50"
         >
           {carregando ? "CRIANDO..." : "CRIAR CONTA"}
         </button>
