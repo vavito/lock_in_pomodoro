@@ -54,7 +54,7 @@ function ToggleTema() {
 export function AppShell({ children }: { children: ReactNode }) {
   const { usuario, logout } = useAuth();
   const router = useRouter();
-  const [sidebarAberta, setSidebarAberta] = useState(true);
+  const [sidebarAberta, setSidebarAberta] = useState(false);
 
   useEffect(() => {
     const valorSalvo = localStorage.getItem("lockin.sidebarAberta");

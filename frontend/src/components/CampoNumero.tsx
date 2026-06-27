@@ -25,7 +25,7 @@ export function CampoNumero({ rotulo, valor, min, max, erro, onChange }: Props) 
       <span className="text-xs font-medium text-muted-foreground">{rotulo}</span>
       <div
         className={
-          "grid h-11 grid-cols-[2.75rem_1fr_2.75rem] overflow-hidden rounded-lg border bg-background transition-all duration-200 focus-within:ring-2 hover:shadow-md " +
+          "grid h-11 grid-cols-[2.75rem_1fr_2.75rem] overflow-hidden rounded-lg border bg-background transition-all duration-200 focus-within:ring-2 " +
           (erro
             ? "border-destructive focus-within:ring-destructive"
             : "border-border focus-within:ring-primary")

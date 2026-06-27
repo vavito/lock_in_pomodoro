@@ -37,6 +37,7 @@ function LoginPage() {
     setCarregando(true);
     try {
       await login(email, senha);
+      localStorage.setItem("lockin.sidebarAberta", "false");
       router.navigate({ to: "/" });
     } catch (err) {
       setErro((err as Error).message);
