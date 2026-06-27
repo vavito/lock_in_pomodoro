@@ -43,22 +43,31 @@ function tocarAlarme() {
       window.AudioContext ||
       (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     const ctx = new Ctx();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.type = "sine";
-    osc.frequency.value = 880;
-    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.3, ctx.currentTime + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.8);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.85);
+    const master = ctx.createGain();
+    master.connect(ctx.destination);
+    master.gain.setValueAtTime(0.0001, ctx.currentTime);
+    master.gain.exponentialRampToValueAtTime(0.26, ctx.currentTime + 0.02);
+    master.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.15);
+
+    [0, 0.28, 0.56, 0.84].forEach((inicio, indice) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "square";
+      osc.frequency.setValueAtTime(indice % 2 === 0 ? 880 : 740, ctx.currentTime + inicio);
+      gain.gain.setValueAtTime(0.0001, ctx.currentTime + inicio);
+      gain.gain.exponentialRampToValueAtTime(0.8, ctx.currentTime + inicio + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + inicio + 0.18);
+      osc.connect(gain);
+      gain.connect(master);
+      osc.start(ctx.currentTime + inicio);
+      osc.stop(ctx.currentTime + inicio + 0.2);
+    });
+
     window.setTimeout(() => {
       ctx.close().catch((erro) => {
         void erro;
       });
-    }, 1000);
+    }, 1300);
   } catch (erro) {
     void erro;
   }
