@@ -1,14 +1,6 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { TimerContext } from "@/contexts/timer-contexto";
 import { hojeYYYYMMDD } from "@/lib/data";
 import { configuracoesApi, resumosApi, sessoesApi } from "@/services/api";
 import type { Configuracao, ResumoDiario, TipoSessao } from "@/types";
@@ -18,24 +10,6 @@ const ROTULO_TIPO: Record<TipoSessao, string> = {
   DESCANSO_CURTO: "Descanso Curto",
   DESCANSO_LONGO: "Descanso Longo",
 };
-
-type TimerContexto = {
-  config: Configuracao | null;
-  resumo: ResumoDiario | null;
-  tipo: TipoSessao;
-  rodando: boolean;
-  segundosRestantes: number;
-  totalSegundos: number;
-  progresso: number;
-  erro: string | null;
-  iniciar: () => void;
-  parar: () => Promise<void>;
-  pular: () => Promise<void>;
-  selecionarTipo: (tipo: TipoSessao) => void;
-  recarregarResumo: () => Promise<void>;
-};
-
-const TimerContext = createContext<TimerContexto | null>(null);
 
 function tocarAlarme() {
   try {
@@ -376,12 +350,4 @@ export function TimerProvider({ children }: { children: ReactNode }) {
   );
 
   return <TimerContext.Provider value={valor}>{children}</TimerContext.Provider>;
-}
-
-export function useTimer() {
-  const contexto = useContext(TimerContext);
-  if (!contexto) {
-    throw new Error("useTimer deve ser usado dentro de TimerProvider.");
-  }
-  return contexto;
 }

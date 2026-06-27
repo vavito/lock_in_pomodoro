@@ -1,4 +1,4 @@
-import { useTimer } from "@/contexts/TimerContext";
+import { useTimer } from "@/contexts/useTimer";
 import { formatarMMSS } from "@/lib/data";
 import type { TipoSessao } from "@/types";
 import { ResumoDoDia } from "./ResumoDoDia";
